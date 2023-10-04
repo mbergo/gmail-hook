@@ -1,13 +1,16 @@
+import fastapi
 import openai
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 function_descriptions = [
     {
@@ -20,101 +23,83 @@ function_descriptions = [
                     "type": "string",
                     "description": "the name of the company that sent the email"
                 },                                        
-                "product": {
+                "purpose": {
                     "type": "string",
-                    "description": "Try to identify which product the client is interested in, if any"
+                    "description": "Try to identify what is the purpose of the email, such as 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
                 },
-                "amount":{
+                "relevance":{
                     "type": "string",
-                    "description": "Try to identify the amount of products the client wants to purchase, if any"
+                    "description": "Try to identify the relevance of the emai. If it is a campaign email, it is not relevant; if it is a reply to a reply, it is relevant; if it customer sales, it is not relevant; etc. Categorise as low, medium, high"
                 },
                 "category": {
                     "type": "string",
                     "description": "Try to categorise this email into categories like those: 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
                 },
-                "nextStep":{
-                    "type": "string",
-                    "description": "What is the suggested next step to move this forward?"
-                },
-                "priority": {
-                    "type": "string",
-                    "description": "Try to give a priority score to this email based on how likely this email will leads to a good business opportunity, from 0 to 10; 10 most important"
-                },
             },
-            "required": ["companyName", "amount", "product", "priority", "category", "nextStep"]
+            "required": ["companyName", "purpose", "relevance", "category"]
         }
     }
 ]
 
+class Email(BaseModel):
+    from_email: str
+    content: str
 
-email = """
-Dear Jason 
-I hope this message finds you well. I'm Shirley from Gucci;
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
 
-I'm looking to purchase some company T-shirt for my team, we are a team of 100k people, and we want to get 2 t-shirt per personl
+@app.post("/")
+def analyse_email(email: Email):
+    content = email.content
+    query = f"Please extract key information from this email: {content} "
 
-Please let me know the price and timeline you can work with;
+    messages = [{"role": "user", "content": query}]
 
-Looking forward
+    response = openai.ChatCompletion.create(
+        model="gpt-4-0613",
+        messages=messages,
+        functions = function_descriptions,
+        function_call="auto"
+    )
 
-Shirley Lou
-"""
-
-prompt = f"Please extract key information from this email: {email} "
-message = [{"role": "user", "content": prompt}]
-
-response = openai.ChatCompletion.create(
-    model="gpt-4-0613",
-    messages=message,
-    functions = function_descriptions,
-    function_call="auto"
-)
-
-print(response)
-
-
-
-
+    arguments = response.choices[0]["message"]["function_call"]["arguments"]
+    companyName = eval(arguments).get("companyName")
+    relevance = eval(arguments).get("relevance")
+    purpose = eval(arguments).get("purpose")
+    category = eval(arguments).get("category")  
 
 
+    return {
+        "companyName": companyName,
+        "relevance": relevance,
+        "purpose": purpose,
+        "purpose": purpose,
+        "category": category
+        }
 
 
-# class Email(BaseModel):
-#     from_email: str
-#     content: str
+# email = """
+# Dear Jason 
+# I hope this message finds you well. I'm Shirley from Gucci;
 
-# @app.get("/")
-# def read_root():
-#     return {"Hello": "World"}
+# I'm looking to purchase some company T-shirt for my team, we are a team of 100k people, and we want to get 2 t-shirt per personl
 
-# @app.post("/")
-# def analyse_email(email: Email):
-#     content = email.content
-#     query = f"Please extract key information from this email: {content} "
+# Please let me know the price and timeline you can work with;
 
-#     messages = [{"role": "user", "content": query}]
+# Looking forward
 
-#     response = openai.ChatCompletion.create(
-#         model="gpt-4-0613",
-#         messages=messages,
-#         functions = function_descriptions,
-#         function_call="auto"
-#     )
+# Shirley Lou
+# """
 
-#     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-#     companyName = eval(arguments).get("companyName")
-#     priority = eval(arguments).get("priority")
-#     product = eval(arguments).get("product")
-#     amount = eval(arguments).get("amount")
-#     category = eval(arguments).get("category")
-#     nextStep = eval(arguments).get("nextStep")
+# prompt = f"Please extract key information from this email: {email} "
+# message = [{"role": "user", "content": prompt}]
 
-#     return {
-#         "companyName": companyName,
-#         "product": product,
-#         "amount": amount,
-#         "priority": priority,
-#         "category": category,
-#         "nextStep": nextStep
-#     }
+# response = openai.ChatCompletion.create(
+#     model="gpt-4-0613",
+#     messages=message,
+#     functions = function_descriptions,
+#     function_call="auto"
+# )
 
+# print(response)

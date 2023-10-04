@@ -29,14 +29,18 @@ function_descriptions = [
                 },
                 "relevance":{
                     "type": "string",
-                    "description": "Try to identify the relevance of the emai. If it is a campaign email, it is not relevant; if it is a reply to a reply, it is relevant; if it customer sales, it is not relevant; etc. Categorise as low, medium, high"
+                    "description": "Try to identify the relevance of the emai. If it is a campaign email, it is not relevant; if it is a reply to a reply, it is relevant; if it customer sales, it is not relevant; etc. Categorise as low, medium, high as you see fit by if the email was sent to many people, the lower the relevance."
                 },
                 "category": {
                     "type": "string",
                     "description": "Try to categorise this email into categories like those: 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
                 },
+                "reply": {
+                    "type": "string",
+                    "description": "Try to identify if this email is a reply to a previous email or not. If it is a reply, it is a reply; if it is a new email, it is not a reply."
+                }
             },
-            "required": ["companyName", "purpose", "relevance", "category"]
+            "required": ["companyName", "purpose", "relevance", "category", "reply"]
         }
     }
 ]
@@ -67,14 +71,16 @@ def analyse_email(email: Email):
     companyName = eval(arguments).get("companyName")
     relevance = eval(arguments).get("relevance")
     purpose = eval(arguments).get("purpose")
-    category = eval(arguments).get("category")  
+    category = eval(arguments).get("category")
+    reply = eval(arguments).get("reply")
 
 
     return {
         "companyName": companyName,
         "relevance": relevance,
         "purpose": purpose,
-        "category": category
+        "category": category,
+        "reply": reply
         }
 
 

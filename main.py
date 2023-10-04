@@ -74,7 +74,6 @@ def analyse_email(email: Email):
         "companyName": companyName,
         "relevance": relevance,
         "purpose": purpose,
-        "purpose": purpose,
         "category": category
         }
 

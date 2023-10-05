@@ -38,9 +38,13 @@ function_descriptions = [
                 "reply": {
                     "type": "string",
                     "description": "Try to identify if this email is a reply to a previous email or not. If it is a reply, it is a reply; if it is a new email, it is not a reply."
+                },
+                "suggested_reply": {
+                    "type": "string",
+                    "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
                 }
             },
-            "required": ["companyName", "purpose", "relevance", "category", "reply"]
+            "required": ["companyName", "purpose", "relevance", "category", "reply", "suggested_reply"]
         }
     }
 ]
@@ -73,6 +77,7 @@ def analyse_email(email: Email):
     purpose = eval(arguments).get("purpose")
     category = eval(arguments).get("category")
     reply = eval(arguments).get("reply")
+    suggested_reply = eval(arguments).get("suggested_reply")
 
 
     return {
@@ -80,7 +85,8 @@ def analyse_email(email: Email):
         "relevance": relevance,
         "purpose": purpose,
         "category": category,
-        "reply": reply
+        "reply": reply,
+        "suggested_reply": suggested_reply
         }
 
 

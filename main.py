@@ -71,7 +71,7 @@ def analyse_email(email: Email):
         function_call="auto"
     )
 
-    arguments = response.choices[0]["message"]["function_call"]["arguments"]s
+    arguments = response.choices[0]["message"]["function_call"]["arguments"]
     vmName = eval(arguments).get("vmName")
     Status = eval(arguments).get("Status")
     Responsible = eval(arguments).get("Responsible")

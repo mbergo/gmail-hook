@@ -15,7 +15,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as use case, company name, contact details, etc.",
+        "description": "categorise & extract key info from an email, such as problems, incidents, contact details, Company, etc.",
         "parameters": {
             "type": "object",
             "properties": {
@@ -23,28 +23,28 @@ function_descriptions = [
                     "type": "string",
                     "description": "the name of the company that sent the email"
                 },                                        
-                "purpose": {
+                "incident": {
                     "type": "string",
-                    "description": "Try to identify what is the purpose of the email, such as 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
+                    "description": "Try to identify what is the problem that the person is complaining about. The summary of a problem which creates an incident."
                 },
-                "relevance":{
+                "title":{
                     "type": "string",
-                    "description": "Try to identify the relevance of the emai. If it is a campaign email, it is not relevant; if it is a reply to a reply, it is relevant; if it customer sales, it is not relevant; etc. Categorise as low, medium, high as you see fit by if the email was sent to many people, the lower the relevance."
+                    "description": "Try to identify a propper title for this incident."
                 },
-                "category": {
+                "severity": {
                     "type": "string",
-                    "description": "Try to categorise this email into categories like those: 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
+                    "description": "Try to categorise this incident from email as low medium or high. If it is low, it is low; if it is medium, it is medium; if it is high, it is high."
                 },
                 "reply": {
                     "type": "string",
-                    "description": "Try to identify if this email is a reply to a previous email or not. If it is a reply, it is a reply; if it is a new email, it is not a reply."
+                    "description": "Try to create a support reply to the customer in from his email in order to calm him down"
                 },
-                "suggested_reply": {
+                "fixes": {
                     "type": "string",
-                    "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
+                    "description": "Suggest based on the problem identified on the email, fixes or paths to people debug the problem."
                 }
             },
-            "required": ["companyName", "purpose", "relevance", "category", "reply", "suggested_reply"]
+            "required": ["companyName", "incident", "severity", "reply", "fixes"]
         }
     }
 ]
@@ -72,21 +72,24 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    companyName = eval(arguments).get("companyName")
-    relevance = eval(arguments).get("relevance")
-    purpose = eval(arguments).get("purpose")
-    category = eval(arguments).get("category")
+    # companyName = eval(arguments).get("companyName")
+    # relevance = eval(arguments).get("relevance")
+    # purpose = eval(arguments).get("purpose")
+    # category = eval(arguments).get("category")
+    # reply = eval(arguments).get("reply")
+    # suggested_reply = eval(arguments).get("suggested_reply")
+    incident = eval(arguments).get("incident")
+    title = eval(arguments).get("title")
+    severity = eval(arguments).get("severity")
+    fixes = eval(arguments).get("fixes")
     reply = eval(arguments).get("reply")
-    suggested_reply = eval(arguments).get("suggested_reply")
-
 
     return {
-        "companyName": companyName,
-        "relevance": relevance,
-        "purpose": purpose,
-        "category": category,
-        "reply": reply,
-        "suggested_reply": suggested_reply
+        "incident": incident,
+        "title": title,
+        "severity": severity,
+        "fixes": fixes,
+        "reply": reply
         }
 
 

@@ -33,7 +33,7 @@ function_descriptions = [
                 },
                 "Impedment": {
                     "type": "string",
-                    "description": "Try to identify if the virtual machine is not migrated what is the impedment for it to be migrated. Use the impedment. If none just use None."
+                    "description": "Try to identify if the virtual machine is not migrated what is the impedment for it to not be migrated. It should be something negative that goes against the flow expected."
                 },
                 "jiraTickets": {
                     "type": "string",
@@ -41,7 +41,7 @@ function_descriptions = [
                 },
                 "comments": {
                     "type": "string",
-                    "description": "Try to identify any comments related to the virtual machine. Use the comment. If none just use None."
+                    "description": "Try to identify any comments related to migration. Comments don't have a positive or negative impact. It should be just additional information."
                 },
             },
             "required": ["vmName", "Status", "Responsible", "Impedment", "jiraTickets", "comments"]
@@ -55,7 +55,7 @@ class Email(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello World"}
+    return {"message": "Hello World"}   
 
 @app.post("/")
 def analyse_email(email: Email):

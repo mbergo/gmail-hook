@@ -19,32 +19,32 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "companyName": {
+                "vmName": {
                     "type": "string",
-                    "description": "the name of the company that sent the email"
+                    "description": "the name of virtual machine quoted on the email."
                 },                                        
-                "incident": {
+                "Status": {
                     "type": "string",
-                    "description": "Try to identify what is the problem that the person is complaining about. The summary of a problem which creates an incident."
+                    "description": "Try to identify if said virtual machine was migrated already or not. Use just migrated or not migrated."
                 },
-                "title":{
+                "Responsible":{
                     "type": "string",
-                    "description": "Try to identify a propper title for this incident."
+                    "description": "Try to identify the person handling the migration. Use the name of the person. If it is not clear, use the name of the person who sent the email."
                 },
-                "severity": {
+                "Impedment": {
                     "type": "string",
-                    "description": "Try to categorise this incident from email as low medium or high. If it is low, it is low; if it is medium, it is medium; if it is high, it is high."
+                    "description": "Try to identify if the virtual machine is not migrated what is the impedment for it to be migrated. Use the impedment. If none just use None."
                 },
-                "reply": {
+                "jiraTickets": {
                     "type": "string",
-                    "description": "Try to create a support reply to the customer in from his email in order to calm him down"
+                    "description": "Try to identify any Jira tickets related to the virtual machine. Use the Jira ticket number (XXX-0101). If none just use None."
                 },
-                "fixes": {
+                "comments": {
                     "type": "string",
-                    "description": "Suggest based on the problem identified on the email, fixes or paths to people debug the problem."
-                }
+                    "description": "Try to identify any comments related to the virtual machine. Use the comment. If none just use None."
+                },
             },
-            "required": ["companyName", "incident", "severity", "reply", "fixes"]
+            "required": ["vmName", "Status", "Responsible", "Impedment", "jiraTickets", "comments"]
         }
     }
 ]
@@ -71,49 +71,20 @@ def analyse_email(email: Email):
         function_call="auto"
     )
 
-    arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    # companyName = eval(arguments).get("companyName")
-    # relevance = eval(arguments).get("relevance")
-    # purpose = eval(arguments).get("purpose")
-    # category = eval(arguments).get("category")
-    # reply = eval(arguments).get("reply")
-    # suggested_reply = eval(arguments).get("suggested_reply")
-    incident = eval(arguments).get("incident")
-    title = eval(arguments).get("title")
-    severity = eval(arguments).get("severity")
-    fixes = eval(arguments).get("fixes")
-    reply = eval(arguments).get("reply")
+    arguments = response.choices[0]["message"]["function_call"]["arguments"]s
+    vmName = eval(arguments).get("vmName")
+    Status = eval(arguments).get("Status")
+    Responsible = eval(arguments).get("Responsible")
+    Impedment = eval(arguments).get("Impedment")
+    jiraTickets = eval(arguments).get("jiraTickets")
+    comments = eval(arguments).get("comments")
 
+    
     return {
-        "incident": incident,
-        "title": title,
-        "severity": severity,
-        "fixes": fixes,
-        "reply": reply
+        "vmName": vmName,
+        "Status": Status,
+        "Responsible": Responsible,
+        "Impedment": Impedment,
+        "jiraTickets": jiraTickets,
+        "comments": comments
         }
-
-
-# email = """
-# Dear Jason 
-# I hope this message finds you well. I'm Shirley from Gucci;
-
-# I'm looking to purchase some company T-shirt for my team, we are a team of 100k people, and we want to get 2 t-shirt per personl
-
-# Please let me know the price and timeline you can work with;
-
-# Looking forward
-
-# Shirley Lou
-# """
-
-# prompt = f"Please extract key information from this email: {email} "
-# message = [{"role": "user", "content": prompt}]
-
-# response = openai.ChatCompletion.create(
-#     model="gpt-4-0613",
-#     messages=message,
-#     functions = function_descriptions,
-#     function_call="auto"
-# )
-
-# print(response)

@@ -15,36 +15,32 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as problems, incidents, contact details, Company, etc.",
+        "description": "categorise & extract key info from an email, such as tasks, problems and useful information.",
         "parameters": {
             "type": "object",
             "properties": {
-                "vmName": {
-                    "type": "string",
-                    "description": "the name of virtual machine quoted on the email."
+                "people": {
+                    "type": "array",
+                    "description": "the names of people quoted on the email."
                 },                                        
-                "Status": {
+                "Problems": {
                     "type": "string",
-                    "description": "Try to identify if said virtual machine was migrated already or not. Use just migrated or not migrated."
+                    "description": "Try to identify the problems that are mentioned on the email. Use the name of the problem. If it is not clear, use the name of the problem that is mentioned on the email."
                 },
-                "Responsible":{
+                "Tools":{
                     "type": "string",
-                    "description": "Try to identify the person handling the migration. Use the name of the person. If it is not clear, use the name of the person who sent the email."
+                    "description": "Try to identify the tools that are mentioned on the email. Like clouds, SaaSs or tools. Use the name of the tool. If it is not clear, use the name of the tool that is mentioned on the email."
                 },
-                "Impedment": {
+                "Tasks": {
                     "type": "string",
-                    "description": "Try to identify if the virtual machine is not migrated what is the impedment for it to not be migrated. It should be something negative that goes against the flow expected."
+                    "description": "Try to identify which tasks are being asked on the email. Use the name of the task. If it is not clear, use the name of the task that is mentioned on the email. Try to ennumerate them."
                 },
-                "jiraTickets": {
+                "Comments": {
                     "type": "string",
-                    "description": "Try to identify any Jira tickets related to the virtual machine. Use the Jira ticket number (XXX-0101). If none just use None."
-                },
-                "comments": {
-                    "type": "string",
-                    "description": "Try to identify any comments related to migration. Comments don't have a positive or negative impact. It should be just additional information."
+                    "description": "Try to identify any comments that have lots of relation with what was discussed which would be useful information. Use the name of the comment. If it is not clear, use the name of the comment that is mentioned on the email."
                 },
             },
-            "required": ["vmName", "Status", "Responsible", "Impedment", "jiraTickets", "comments"]
+            "required": ["people", "Problems", "Tools", "Tasks", "Comments"]
         }
     }
 ]
@@ -72,19 +68,17 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    vmName = eval(arguments).get("vmName")
-    Status = eval(arguments).get("Status")
-    Responsible = eval(arguments).get("Responsible")
-    Impedment = eval(arguments).get("Impedment")
-    jiraTickets = eval(arguments).get("jiraTickets")
-    comments = eval(arguments).get("comments")
+    people = eval(arguments).get("people")
+    Problems = eval(arguments).get("Problems")
+    Tools = eval(arguments).get("Tools")
+    Tasks = eval(arguments).get("Tasks")
+    Comments = eval(arguments).get("Comments")
 
     
     return {
-        "vmName": vmName,
-        "Status": Status,
-        "Responsible": Responsible,
-        "Impedment": Impedment,
-        "jiraTickets": jiraTickets,
-        "comments": comments
+        "people": people,
+        "Problems": Problems,
+        "Tools": Tools,
+        "Tasks": Tasks,
+        "Comments": Comments
         }

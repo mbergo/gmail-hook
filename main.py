@@ -20,7 +20,7 @@ function_descriptions = [
             "type": "object",
             "properties": {
                 "people": {
-                    "type": "array",
+                    "type": "string",
                     "description": "the names of people quoted on the email."
                 },                                        
                 "Problems": {

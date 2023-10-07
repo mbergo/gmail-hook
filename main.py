@@ -18,7 +18,7 @@ function_descriptions = [
         "description": "categorise & extract key info from an email, such as tasks, problems and useful information.",
         "parameters": {
             "type": "object",
-            "pr¨perties": {
+            "properties": {
                 "title": {
                     "type": "string",
                     "description": "By getting the context of what was in the email, generate a text for the meeting."

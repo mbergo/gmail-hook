@@ -18,7 +18,11 @@ function_descriptions = [
         "description": "categorise & extract key info from an email, such as tasks, problems and useful information.",
         "parameters": {
             "type": "object",
-            "properties": {
+            "pr¨perties": {
+                "title": {
+                    "type": "string",
+                    "description": "By getting the context of what was in the email, generate a text for the meeting."
+                },
                 "people": {
                     "type": "string",
                     "description": "the names of people quoted on the email."
@@ -40,7 +44,7 @@ function_descriptions = [
                     "description": "Try to identify any comments that have lots of relation with what was discussed which would be useful information. Use the name of the comment. If it is not clear, use the name of the comment that is mentioned on the email."
                 },
             },
-            "required": ["people", "Problems", "Tools", "Tasks", "Comments"]
+            "required": ["title", "people", "Problems", "Tools", "Tasks", "Comments"]
         }
     }
 ]
@@ -73,6 +77,7 @@ def analyse_email(email: Email):
     Tools = eval(arguments).get("Tools")
     Tasks = eval(arguments).get("Tasks")
     Comments = eval(arguments).get("Comments")
+    title = eval(arguments).get("title")
 
     
     return {
@@ -80,5 +85,6 @@ def analyse_email(email: Email):
         "Problems": Problems,
         "Tools": Tools,
         "Tasks": Tasks,
-        "Comments": Comments
+        "Comments": Comments,
+        "title": title
         }

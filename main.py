@@ -15,36 +15,20 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as use case, company name, contact details, etc.",
+        "description": "Interpret the email content  & extract key info from an email, such as probability, using the given info for relationshp advice.",
         "parameters": {
             "type": "object",
             "properties": {
-                "companyName": {
+                "action": {
                     "type": "string",
-                    "description": "the name of the company that sent the email"
+                    "description": "Which is the best approach for the person in question towards the loved one."
                 },                                        
-                "purpose": {
+                "chances": {
                     "type": "string",
-                    "description": "Try to identify what is the purpose of the email, such as 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
-                },
-                "relevance":{
-                    "type": "string",
-                    "description": "Try to identify the relevance of the emai. If it is a campaign email, it is not relevant; if it is a reply to a reply, it is relevant; if it customer sales, it is not relevant; etc. Categorise as low, medium, high as you see fit by if the email was sent to many people, the lower the relevance."
-                },
-                "category": {
-                    "type": "string",
-                    "description": "Try to categorise this email into categories like those: 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
-                },
-                "reply": {
-                    "type": "string",
-                    "description": "Try to identify if this email is a reply to a previous email or not. If it is a reply, it is a reply; if it is a new email, it is not a reply."
-                },
-                "suggested_reply": {
-                    "type": "string",
-                    "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
+                    "description": "Try to identify the chances of success of the realionship. High, medium or low."
                 }
             },
-            "required": ["companyName", "purpose", "relevance", "category", "reply", "suggested_reply"]
+            "required": ["action", "chances"]
         }
     }
 ]
@@ -72,22 +56,13 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    companyName = eval(arguments).get("companyName")
-    relevance = eval(arguments).get("relevance")
-    purpose = eval(arguments).get("purpose")
-    category = eval(arguments).get("category")
-    reply = eval(arguments).get("reply")
-    suggested_reply = eval(arguments).get("suggested_reply")
-
+    action = eval(arguments).get("action")
+    chances = eval(arguments).get("chances")
 
     return {
-        "companyName": companyName,
-        "relevance": relevance,
-        "purpose": purpose,
-        "category": category,
-        "reply": reply,
-        "suggested_reply": suggested_reply
-        }
+        "action": action,
+        "chances": chances 
+    }
 
 
 # email = """

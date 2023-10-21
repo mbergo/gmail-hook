@@ -19,6 +19,10 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
+                "from_email": {
+                    "type": "string",
+                    "description": "Email address of the person who sent the email."
+                },
                 "action": {
                     "type": "string",
                     "description": "Which is the best approach for the person in question towards the loved one."
@@ -41,9 +45,17 @@ function_descriptions = [
                         "type": "string"
                     },
                     "description": "Topics discussed in the between the parts involved."
+                },
+                "content": {
+                    "type": "string",
+                    "description": "Content of the email."
+                },
+                "activity": {
+                    "type": "string",
+                    "description": "Activities liked by the person in question."
                 }
             },
-            "required": ["action", "chances", "suggestions", "move", "topics"]
+            "required": ["from_email", "action", "chances", "suggestions", "move", "topics", "content", "activity"]
         }
     }
 ]
@@ -71,16 +83,20 @@ def analyse_email(email: Email):
     )
     
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
+    from_email = eval(arguments).get("from_email")
     action = eval(arguments).get("action")
     chances = eval(arguments).get("chances")
     suggestions = eval(arguments).get("suggestions")
     move = eval(arguments).get("move")
     topics = eval(arguments).get("topics")
+    activity = eval(arguments).get("activity")
 
     return {
+        "from_email": from_email,
         "action": action,
         "chances": chances,
         "suggestion": suggestions,
         "move": move,
-        "topics": topics
+        "topics": topics,
+        "activity": activity
     }

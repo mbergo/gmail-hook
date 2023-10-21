@@ -63,18 +63,15 @@ def analyse_email(email: Email):
         function_call="auto"
     )
     
-    response_message = response["choices"][0]["message"]
+    arguments = response.choices[0]["message"]["function_call"]["arguments"]
+    action = eval(arguments).get("action")
+    chances = eval(arguments).get("chances")
+    suggestions = eval(arguments).get("suggestions")
+    nextMove = eval(arguments).get("nextMove")
 
-    if response_message.get("function_call"):
-        arguments = response.choices[0]["message"]["function_call"]["arguments"]
-        action = eval(arguments).get("action")
-        chances = eval(arguments).get("chances")
-        suggestions = eval(arguments).get("suggestions")
-        nextMove = eval(arguments).get("nextMove")
-
-        return {
-            "action": action,
-            "chances": chances,
-            "suggestion": suggestions,
-            "nextMove": nextMove
-        }
+    return {
+        "action": action,
+        "chances": chances,
+        "suggestion": suggestions,
+        "nextMove": nextMove
+    }

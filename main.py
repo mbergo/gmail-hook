@@ -30,10 +30,13 @@ function_descriptions = [
                 "suggestions": {
                     "type": "string",
                     "description": "Suggestions to improve the chances of success in the context of what was discussed."
-                
+                },
+                "next_move": {
+                    "type": "string",
+                    "description": "Suggestion to propose a next move in order to increase his chances with the lady."
                 }
             },
-            "required": ["action", "chances", "suggestions"]
+            "required": ["action", "chances", "suggestions", "next_move"]
         }
     }
 ]
@@ -64,11 +67,13 @@ def analyse_email(email: Email):
     action = eval(arguments).get("action")
     chances = eval(arguments).get("chances")
     suggestions = eval(arguments).get("suggestions")
+    next_move = eval(arguments).get("next_move")
 
     return {
         "action": action,
         "chances": chances,
-        "suggestion": suggestions
+        "suggestion": suggestions,
+        "next_move": next_move
     }
 
 

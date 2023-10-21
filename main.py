@@ -30,13 +30,13 @@ function_descriptions = [
                 "suggestions": {
                     "type": "string",
                     "description": "Suggestions to improve the chances of success in the context of what was discussed."
+                },
+                "move": {
+                    "type": "string",
+                    "description": "Suggestion to propose a next move in order to increase his chances."
                 }
-                # "nextMove": {
-                #     "type": "string",
-                #     "description": "Suggestion to propose a next move in order to increase his chances with the lady."
-                # }
             },
-            "required": ["action", "chances", "suggestions"]
+            "required": ["action", "chances", "suggestions", "move"]
         }
     }
 ]
@@ -57,7 +57,7 @@ def analyse_email(email: Email):
     messages = [{"role": "user", "content": query}]
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0613",
+        model="gpt-4-0613",
         messages=messages,
         functions = function_descriptions,
         function_call="auto"
@@ -67,11 +67,11 @@ def analyse_email(email: Email):
     action = eval(arguments).get("action")
     chances = eval(arguments).get("chances")
     suggestions = eval(arguments).get("suggestions")
-    # nextMove = eval(arguments).get("nextMove")
+    move = eval(arguments).get("move")
 
     return {
         "action": action,
         "chances": chances,
-        "suggestion": suggestions
-        # "nextMove": nextMove
+        "suggestion": suggestions,
+        "move": move
     }

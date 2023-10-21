@@ -63,6 +63,7 @@ def analyse_email(email: Email):
         function_call="auto"
     )
 
+    print(response)
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
     action = eval(arguments).get("action")
     chances = eval(arguments).get("chances")

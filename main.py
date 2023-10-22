@@ -80,10 +80,6 @@ def analyse_email(email: Email):
     move = eval(arguments).get("move")
     topics = eval(arguments).get("topics")
 
-    
-    
-
-
     return {
         "situation": situation,
         "action": action,

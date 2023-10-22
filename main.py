@@ -33,25 +33,18 @@ function_descriptions = [
                 },
                 "suggestions": {
                     "type": "string",
-                    "description": "Suggestions to improve the chances of success in the context of what was discussed."
+                    "description": "Try to suggest activities that can improve their relationshp."
                 },
                 "move": {
                     "type": "string",
-                    "description": "Suggestion to propose a next move in order to increase his chances."
+                    "description": "Try suggestion of micro actions that can be done to attract her his attention."
                 },
                 "topics": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Topics discussed in the between the parts involved."
-                },
-                "activities": {
                     "type": "string",
-                    "description": "Activities liked in the context of the relationship."
+                    "description": "Tru to identify topics discussed in the between the parts involved."
                 }
             },
-            "required": ["situation", "action", "chances", "suggestions", "move", "topics", "activities"]
+            "required": ["situation", "action", "chances", "suggestions", "move", "topics"]
         }
     }
 ]
@@ -78,14 +71,25 @@ def analyse_email(email: Email):
         function_call="auto"
     )
     
-    arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    situation = eval(arguments).get("situation")
-    action = eval(arguments).get("action")
-    chances = eval(arguments).get("chances")
-    suggestions = eval(arguments).get("suggestions")
-    move = eval(arguments).get("move")
-    topics = eval(arguments).get("topics")
-    activities = eval(arguments).get("activities")
+    try:
+        arguments = response.choices[0]["message"]["function_call"]["arguments"]
+        situation = eval(arguments).get("situation")
+        action = eval(arguments).get("action")
+        chances = eval(arguments).get("chances")
+        suggestions = eval(arguments).get("suggestions")
+        move = eval(arguments).get("move")
+        topics = eval(arguments).get("topics")
+    except:
+        situation = "",
+        action = "",
+        chances = "",
+        suggestions = "",
+        move = "",
+        topics = ""
+        pass
+    
+    
+
 
     return {
         "situation": situation,
@@ -93,6 +97,5 @@ def analyse_email(email: Email):
         "chances": chances,
         "suggestion": suggestions,
         "move": move,
-        "topics": topics,
-        "activities": activities
+        "topics": topics
     }

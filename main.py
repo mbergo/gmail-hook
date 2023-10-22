@@ -19,9 +19,9 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "from_email": {
+                "situation": {
                     "type": "string",
-                    "description": "Email address of the person who sent the email."
+                    "description": "Situation of the person in question."
                 },
                 "action": {
                     "type": "string",
@@ -46,16 +46,12 @@ function_descriptions = [
                     },
                     "description": "Topics discussed in the between the parts involved."
                 },
-                "content": {
+                "activities": {
                     "type": "string",
-                    "description": "Content of the email."
-                },
-                "activity": {
-                    "type": "string",
-                    "description": "Activities liked by the person in question."
+                    "description": "Activities liked in the context of the relationship."
                 }
             },
-            "required": ["from_email", "action", "chances", "suggestions", "move", "topics", "content", "activity"]
+            "required": ["situation", "action", "chances", "suggestions", "move", "topics", "activities"]
         }
     }
 ]
@@ -83,20 +79,20 @@ def analyse_email(email: Email):
     )
     
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    from_email = eval(arguments).get("from_email")
+    situation = eval(arguments).get("situation")
     action = eval(arguments).get("action")
     chances = eval(arguments).get("chances")
     suggestions = eval(arguments).get("suggestions")
     move = eval(arguments).get("move")
     topics = eval(arguments).get("topics")
-    activity = eval(arguments).get("activity")
+    activities = eval(arguments).get("activities")
 
     return {
-        "from_email": from_email,
+        "situation": situation,
         "action": action,
         "chances": chances,
         "suggestion": suggestions,
         "move": move,
         "topics": topics,
-        "activity": activity
+        "activities": activities
     }

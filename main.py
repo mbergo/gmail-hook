@@ -15,7 +15,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "Interpret the email content  & extract key info from an email. Try to identify the situation, action, chances, suggestions, move and topics discussed in the email. Otherwise just fill with NULL.",
+        "description": "Interpret the email content and try to extract key info from it. Try to identify the situation, action, chances, suggestions, move and topics discussed in the email. Otherwise just fill with NULL.",
         "parameters": {
             "type": "object",
             "properties": {

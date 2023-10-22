@@ -15,29 +15,29 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "Interpret the email content  & extract key info from an email, such as probability, using the given info for relationshp advice.",
+        "description": "Interpret the email content  & extract key info from an email. Try to identify the situation, action, chances, suggestions, move and topics discussed in the email. Otherwise just fill with NULL.",
         "parameters": {
             "type": "object",
             "properties": {
                 "situation": {
                     "type": "string",
-                    "description": "Situation of the person in question."
+                    "description": "Situation of the person in question. Like mood, feelings, etc."
                 },
                 "action": {
                     "type": "string",
-                    "description": "Which is the best approach for the person in question towards the loved one."
+                    "description": "Which is the best approach for the person in question towards to get better results."
                 },                                        
                 "chances": {
                     "type": "string",
-                    "description": "Try to identify the chances of success of the realionship. High, medium or low."
+                    "description": "Try to identify the chances of success of their goals. High, medium or low."
                 },
                 "suggestions": {
                     "type": "string",
-                    "description": "Try to suggest activities that can improve their relationshp."
+                    "description": "Try to suggest activities that can improve their life according with the information."
                 },
                 "move": {
                     "type": "string",
-                    "description": "Try suggestion of micro actions that can be done to attract her his attention."
+                    "description": "Try suggestion of micro actions that can be done to have a start."
                 },
                 "topics": {
                     "type": "string",
@@ -71,22 +71,15 @@ def analyse_email(email: Email):
         function_call="auto"
     )
     
-    try:
-        arguments = response.choices[0]["message"]["function_call"]["arguments"]
-        situation = eval(arguments).get("situation")
-        action = eval(arguments).get("action")
-        chances = eval(arguments).get("chances")
-        suggestions = eval(arguments).get("suggestions")
-        move = eval(arguments).get("move")
-        topics = eval(arguments).get("topics")
-    except:
-        situation = "",
-        action = "",
-        chances = "",
-        suggestions = "",
-        move = "",
-        topics = ""
-        pass
+
+    arguments = response.choices[0]["message"]["function_call"]["arguments"]
+    situation = eval(arguments).get("situation")
+    action = eval(arguments).get("action")
+    chances = eval(arguments).get("chances")
+    suggestions = eval(arguments).get("suggestions")
+    move = eval(arguments).get("move")
+    topics = eval(arguments).get("topics")
+
     
     
 

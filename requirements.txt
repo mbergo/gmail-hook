@@ -3,4 +3,4 @@ openai
 python-dotenv
 pydantic
 uvicorn
-email-validator
+email-validator==1.3.1

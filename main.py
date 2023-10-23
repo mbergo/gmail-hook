@@ -58,7 +58,7 @@ def read_root():
     return {"message": "Hello World"}
 
 @app.post("/")
-def extract_info_from_email(email: Email):
+def analyse_email(email: Email):
     content = email.content
     query = f"Please extract key information from this email: {content} "
 

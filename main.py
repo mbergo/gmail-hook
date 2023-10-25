@@ -15,36 +15,32 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as use case, company name, contact details, etc.",
+        "description": "categorise & extract key info from an email, such as use situatio, company name/product name, problem, requisition, etc.",
         "parameters": {
             "type": "object",
             "properties": {
                 "companyName": {
                     "type": "string",
-                    "description": "the name of the company that sent the email"
+                    "description": "the name of the company that sent the email or the product name which the email is about. Whatever is easier."
                 },                                        
-                "purpose": {
+                "task": {
                     "type": "string",
-                    "description": "Try to identify what is the purpose of the email, such as 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
+                    "description": "Try to identify what is the purpose of the email, such as incident report or normal request. Return Request or Incident."
                 },
-                "relevance":{
+                "summary":{
                     "type": "string",
-                    "description": "Try to identify the relevance of the emai. If it is a campaign email, it is not relevant; if it is a reply to a reply, it is relevant; if it customer sales, it is not relevant; etc. Categorise as low, medium, high as you see fit by if the email was sent to many people, the lower the relevance."
+                    "description": "Try to a small summary of the email. Basic what it is about."
                 },
-                "category": {
+                "description": {
                     "type": "string",
-                    "description": "Try to categorise this email into categories like those: 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
-                },
-                "reply": {
-                    "type": "string",
-                    "description": "Try to identify if this email is a reply to a previous email or not. If it is a reply, it is a reply; if it is a new email, it is not a reply."
+                    "description": "Try to write a clearer description of the email for a DevOps understand easily."
                 },
                 "suggested_reply": {
                     "type": "string",
                     "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
                 }
             },
-            "required": ["companyName", "purpose", "relevance", "category", "reply", "suggested_reply"]
+            "required": [ "companyName", "task", "summary", "description", "suggested_reply"]
         }
     }
 ]
@@ -73,19 +69,17 @@ def analyse_email(email: Email):
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
     companyName = eval(arguments).get("companyName")
-    relevance = eval(arguments).get("relevance")
-    purpose = eval(arguments).get("purpose")
-    category = eval(arguments).get("category")
-    reply = eval(arguments).get("reply")
+    task = eval(arguments).get("task")
+    summary = eval(arguments).get("summary")
+    description = eval(arguments).get("description")
     suggested_reply = eval(arguments).get("suggested_reply")
 
 
     return {
         "companyName": companyName,
-        "relevance": relevance,
-        "purpose": purpose,
-        "category": category,
-        "reply": reply,
+        "task": task,
+        "summary": summary,
+        "description": description,
         "suggested_reply": suggested_reply
         }
 

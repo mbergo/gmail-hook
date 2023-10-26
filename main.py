@@ -27,6 +27,13 @@ function_descriptions = [
                     "type": "string",
                     "description": "Try to identify what is the purpose of the email, such as incident report or normal request. Return Request or Incident."
                 },
+                "relevance": {
+                    "type": "string",
+                    "description": "Try to identify the relevance of the email, such as urgent or medium or normal."
+                },
+                "category": {
+                    "type": "string",
+                    "description": "Try to identify the category of the email, such as incident report or normal request."
                 "summary":{
                     "type": "string",
                     "description": "Try to a small summary of the email. Basic what it is about."
@@ -41,10 +48,10 @@ function_descriptions = [
                 },
                 "suggested_actions": {
                     "type": "string",
-                    "description": "Suggest actions to take based on the information extracted from the email as a DevOps to mitigate what was extracted."
+                    "description": "Suggest fixes or probably causes to the problem. Even in high level, plot the best you can conclude from the problem. If it is a request, just suggest a flow to be followed."
                 }
             },
-            "required": ["Info_name", "purpose", "relevance", "category", "reply", "suggested_reply"]
+            "required": ["Info_name", "task", "relevance", "category", "summary", "description", "suggested_reply", "suggested_actions"]
         }
     }
 ]
@@ -78,6 +85,7 @@ def analyse_email(email: Email):
     description = eval(arguments).get("description")
     suggested_reply = eval(arguments).get("suggested_reply")
     suggested_actions = eval(arguments).get("suggested_actions")
+
 
 
     return {

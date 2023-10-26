@@ -76,7 +76,7 @@ def analyse_email(email: Email):
 
 
     return {
-        "name": companyName,
+        "name": name,
         "task": task,
         "summary": summary,
         "description": description,

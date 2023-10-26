@@ -19,9 +19,9 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "companyName": {
+                "name": {
                     "type": "string",
-                    "description": "the name of the company that sent the email or the product name which the email is about. Whatever is easier."
+                    "description": "The name of the company that sent the email or the product name which the email is about. Whatever is easier."
                 },                                        
                 "task": {
                     "type": "string",
@@ -40,7 +40,7 @@ function_descriptions = [
                     "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
                 }
             },
-            "required": [ "companyName", "task", "summary", "description", "suggested_reply"]
+            "required": [ "name", "task", "summary", "description", "suggested_reply"]
         }
     }
 ]
@@ -61,14 +61,14 @@ def analyse_email(email: Email):
     messages = [{"role": "user", "content": query}]
 
     response = openai.ChatCompletion.create(
-        model="gpt-4-0613",
+        model="gpt-3.5-turbo-0613",
         messages=messages,
         functions = function_descriptions,
         function_call="auto"
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    companyName = eval(arguments).get("companyName")
+    name = eval(arguments).get("name")
     task = eval(arguments).get("task")
     summary = eval(arguments).get("summary")
     description = eval(arguments).get("description")
@@ -76,7 +76,7 @@ def analyse_email(email: Email):
 
 
     return {
-        "companyName": companyName,
+        "name": companyName,
         "task": task,
         "summary": summary,
         "description": description,

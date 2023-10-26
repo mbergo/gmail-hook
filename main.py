@@ -86,6 +86,7 @@ def analyse_email(email: Email):
     description = eval(arguments).get("description")
     suggested_reply = eval(arguments).get("suggested_reply")
     suggested_actions = eval(arguments).get("suggested_actions")
+    relevance = eval(arguments).get("relevance")
 
 
 
@@ -95,6 +96,7 @@ def analyse_email(email: Email):
         "summary": summary,
         "description": description,
         "suggested_reply": suggested_reply,
+        "relevance": relevance,
         "suggested_actions": suggested_actions
         }
 

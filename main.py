@@ -19,7 +19,7 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "name": {
+                "Info_name": {
                     "type": "string",
                     "description": "The name of the company that sent the email or the product name which the email is about. Whatever is easier."
                 },                                        
@@ -43,10 +43,10 @@ function_descriptions = [
                     "type": "string",
                     "description": "Suggest actions to take based on the information extracted from the email as a DevOps to mitigate what was extracted."
                 }
-            "required": [ "name", "task", "summary", "description", "suggested_reply", "suggested_actions"]
+            },
+            "required": ["Info_name", "purpose", "relevance", "category", "reply", "suggested_reply"]
         }
     }
-
 ]
 
 class Email(BaseModel):
@@ -72,7 +72,7 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    name = eval(arguments).get("name")
+    Info_name = eval(arguments).get("Info_name")
     task = eval(arguments).get("task")
     summary = eval(arguments).get("summary")
     description = eval(arguments).get("description")
@@ -81,7 +81,7 @@ def analyse_email(email: Email):
 
 
     return {
-        "name": name,
+        "Info_name": Info_name,
         "task": task,
         "summary": summary,
         "description": description,

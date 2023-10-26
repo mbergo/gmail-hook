@@ -42,11 +42,11 @@ function_descriptions = [
                 "suggested_actions": {
                     "type": "string",
                     "description": "Suggest actions to take based on the information extracted from the email as a DevOps to mitigate what was extracted."
-                },
+                }
             "required": [ "name", "task", "summary", "description", "suggested_reply", "suggested_actions"]
         }
     }
-    }
+
 ]
 
 class Email(BaseModel):

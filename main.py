@@ -38,10 +38,14 @@ function_descriptions = [
                 "suggested_reply": {
                     "type": "string",
                     "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
-                }
-            },
-            "required": [ "name", "task", "summary", "description", "suggested_reply"]
+                },
+                "suggested_actions": {
+                    "type": "string",
+                    "description": "Suggest actions to take based on the information extracted from the email as a DevOps to mitigate what was extracted."
+                },
+            "required": [ "name", "task", "summary", "description", "suggested_reply", "suggested_actions"]
         }
+    }
     }
 ]
 
@@ -73,6 +77,7 @@ def analyse_email(email: Email):
     summary = eval(arguments).get("summary")
     description = eval(arguments).get("description")
     suggested_reply = eval(arguments).get("suggested_reply")
+    suggested_actions = eval(arguments).get("suggested_actions")
 
 
     return {
@@ -80,7 +85,8 @@ def analyse_email(email: Email):
         "task": task,
         "summary": summary,
         "description": description,
-        "suggested_reply": suggested_reply
+        "suggested_reply": suggested_reply,
+        "suggested_actions": suggested_actions
         }
 
 

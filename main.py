@@ -25,7 +25,7 @@ function_descriptions = [
                 },                                        
                 "task": {
                     "type": "string",
-                    "description": "Try to identify what is the purpose of the email, such as incident report or normal request. Return Request or Incident."
+                    "description": "Try to identify what is the purpose of the email, such as incident report or normal request. Return REQUEST or INCIDENT."
                 },
                 "relevance": {
                     "type": "string",

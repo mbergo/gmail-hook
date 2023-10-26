@@ -34,6 +34,7 @@ function_descriptions = [
                 "category": {
                     "type": "string",
                     "description": "Try to identify the category of the email, such as incident report or normal request."
+                },
                 "summary":{
                     "type": "string",
                     "description": "Try to a small summary of the email. Basic what it is about."

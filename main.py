@@ -50,9 +50,13 @@ function_descriptions = [
                 "suggested_actions": {
                     "type": "string",
                     "description": "Suggest fixes or probably causes to the problem. Even in high level, plot the best you can conclude from the problem. If it is a request, just suggest a flow to be followed."
+                },
+                "confluence_link": {
+                    "type": "string",
+                    "description": "Based on the confluence link provided, try to return the link most related to the email information."
                 }
             },
-            "required": ["Info_name", "task", "relevance", "category", "summary", "description", "suggested_reply", "suggested_actions"]
+            "required": ["Info_name", "task", "relevance", "category", "summary", "description", "suggested_reply", "suggested_actions", "confluence_link"]
         }
     }
 ]
@@ -87,6 +91,7 @@ def analyse_email(email: Email):
     suggested_reply = eval(arguments).get("suggested_reply")
     suggested_actions = eval(arguments).get("suggested_actions")
     relevance = eval(arguments).get("relevance")
+    confluence_link = eval(arguments).get("confluence_link")
 
 
 
@@ -97,7 +102,8 @@ def analyse_email(email: Email):
         "description": description,
         "suggested_reply": suggested_reply,
         "relevance": relevance,
-        "suggested_actions": suggested_actions
+        "suggested_actions": suggested_actions,
+        "confluence_link": confluence_link
         }
 
 

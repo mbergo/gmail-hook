@@ -6,11 +6,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 
+
+
+
 load_dotenv()
 
 app = FastAPI()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = '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'
 
 function_descriptions = [
     {

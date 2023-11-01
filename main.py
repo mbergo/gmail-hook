@@ -22,24 +22,24 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "participant_names": {
+                "psichologicalState": {
                     "type": "string",
-                    "description": "The name of the participants of the email. If there is more than one, please separate them with a comma."
+                    "description": "The psichological state of the user. If there is more than one, please separate them with a comma."
                 },                                        
-                "motivation_level": {
+                "mainProblem": {
                     "type": "string",
-                    "description": "The motivation level of each participant. If there is more than one, please separate them with a comma."
+                    "description": "The main problem that the user is facing. If there is more than one, please separate them with a comma."
                 },
-                "tasks": {
+                "suggestedActions": {
                     "type": "string",
-                    "description": "The tasks that the participants need to do. If there is more than one, please separate them with a comma."
+                    "description": "The suggested actions that the user should take. If there is more than one, please separate them with a comma."
                 },
                 "summary": {
                     "type": "string",
-                    "description": "Summary of the email. Try to a small summary of the email. Basic what it is about."
+                    "description": "The summary of the email regarding as a psychological session."
                 }
             },
-            "required": ["participant_names", "motivation_level", "tasks", "summary"]
+            "required": ["psichologicalState", "mainProblem", "suggestedActions", "summary"]
         }
     }
 ]
@@ -67,17 +67,15 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    participant_names = eval(arguments).get("participant_names")
-    motivation_level = eval(arguments).get("motivation_level")
-    tasks = eval(arguments).get("tasks")
+    psichologicalState = eval(arguments).get("psichologicalState")
+    mainProblem = eval(arguments).get("mainProblem")
+    suggestedActions = eval(arguments).get("suggestedActions")
     summary = eval(arguments).get("summary")
-    
-
 
     return {
-        "participant_names": participant_names,
-        "motivation_level": motivation_level,
-        "tasks": tasks,
+        "psichologicalState": psichologicalState,
+        "mainProblem": mainProblem,
+        "suggestedActions": suggestedActions,
         "summary": summary
         }
 

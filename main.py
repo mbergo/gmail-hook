@@ -19,44 +19,24 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "Info_name": {
+                "participant_names": {
                     "type": "string",
-                    "description": "The name of the company that sent the email or the product name which the email is about. Whatever is easier."
+                    "description": "The name of the participants of the email. If there is more than one, please separate them with a comma."
                 },                                        
-                "task": {
+                "motivation_level": {
                     "type": "string",
-                    "description": "Try to identify what is the purpose of the email, such as incident report or normal request. Return REQUEST or INCIDENT."
+                    "description": "The motivation level of each participant. If there is more than one, please separate them with a comma."
                 },
-                "relevance": {
+                "tasks": {
                     "type": "string",
-                    "description": "Try to identify the relevance of the email, such as urgent or medium or normal."
+                    "description": "The tasks that the participants need to do. If there is more than one, please separate them with a comma."
                 },
-                "category": {
+                "summary": {
                     "type": "string",
-                    "description": "Try to identify the category of the email, such as incident report or normal request."
-                },
-                "summary":{
-                    "type": "string",
-                    "description": "Try to a small summary of the email. Basic what it is about."
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Try to write a clearer description of the email for a DevOps understand easily."
-                },
-                "suggested_reply": {
-                    "type": "string",
-                    "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
-                },
-                "suggested_actions": {
-                    "type": "string",
-                    "description": "Suggest fixes or probably causes to the problem. Even in high level, plot the best you can conclude from the problem. If it is a request, just suggest a flow to be followed."
-                },
-                "confluence_link": {
-                    "type": "string",
-                    "description": "Based on the confluence link provided, try to return the link most related to the email information."
+                    "description": "Summary of the email. Try to a small summary of the email. Basic what it is about."
                 }
             },
-            "required": ["Info_name", "task", "relevance", "category", "summary", "description", "suggested_reply", "suggested_actions", "confluence_link"]
+            "required": ["participant_names", "motivation_level", "tasks", "summary"]
         }
     }
 ]
@@ -84,26 +64,18 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    Info_name = eval(arguments).get("Info_name")
-    task = eval(arguments).get("task")
+    participant_names = eval(arguments).get("participant_names")
+    motivation_level = eval(arguments).get("motivation_level")
+    tasks = eval(arguments).get("tasks")
     summary = eval(arguments).get("summary")
-    description = eval(arguments).get("description")
-    suggested_reply = eval(arguments).get("suggested_reply")
-    suggested_actions = eval(arguments).get("suggested_actions")
-    relevance = eval(arguments).get("relevance")
-    confluence_link = eval(arguments).get("confluence_link")
-
+    
 
 
     return {
-        "Info_name": Info_name,
-        "task": task,
-        "summary": summary,
-        "description": description,
-        "suggested_reply": suggested_reply,
-        "relevance": relevance,
-        "suggested_actions": suggested_actions,
-        "confluence_link": confluence_link
+        "participant_names": participant_names,
+        "motivation_level": motivation_level,
+        "tasks": tasks,
+        "summary": summary
         }
 
 

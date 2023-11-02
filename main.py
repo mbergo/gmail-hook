@@ -13,7 +13,7 @@ load_dotenv()
 
 app = FastAPI()
 
-openai.api_key = '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'
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 function_descriptions = [
     {
@@ -24,7 +24,7 @@ function_descriptions = [
             "properties": {
                 "participant_names": {
                     "type": "string",
-                    "description": "The name of the participants of the email. If there is more than one, please separate them with a comma."
+                    "description": "The name of the participants of the email. Upbeat, medium or down."
                 },                                        
                 "motivation_level": {
                     "type": "string",
@@ -80,29 +80,3 @@ def analyse_email(email: Email):
         "tasks": tasks,
         "summary": summary
         }
-
-
-# email = """
-# Dear Jason 
-# I hope this message finds you well. I'm Shirley from Gucci;
-
-# I'm looking to purchase some company T-shirt for my team, we are a team of 100k people, and we want to get 2 t-shirt per personl
-
-# Please let me know the price and timeline you can work with;
-
-# Looking forward
-
-# Shirley Lou
-# """
-
-# prompt = f"Please extract key information from this email: {email} "
-# message = [{"role": "user", "content": prompt}]
-
-# response = openai.ChatCompletion.create(
-#     model="gpt-4-0613",
-#     messages=message,
-#     functions = function_descriptions,
-#     function_call="auto"
-# )
-
-# print(response)

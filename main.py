@@ -34,7 +34,7 @@ function_descriptions = [
                     "type": "string",
                     "description": "The suggested actions that the user should take. If there is more than one, please separate them with a comma."
                 },
-                "potential_pathologies": {
+                "potentialPathologies": {
                     "type": "string",
                     "description": "The potential pathologies that the user might have. If there is more than one, please separate them with a comma."
                 },
@@ -43,7 +43,7 @@ function_descriptions = [
                     "description": "The summary of the email regarding as a psychological session."
                 }
             },
-            "required": ["psichologicalState", "mainProblem", "suggestedActions", "potential_pathologies" "summary"]
+            "required": ["psichologicalState", "mainProblem", "suggestedActions", "potentialPathologies", "summary"]
         }
     }
 ]
@@ -74,13 +74,13 @@ def analyse_email(email: Email):
     psichologicalState = eval(arguments).get("psichologicalState")
     mainProblem = eval(arguments).get("mainProblem")
     suggestedActions = eval(arguments).get("suggestedActions")
-    potential_pathologies = eval(arguments).get("potential_pathologies")
+    potentialPathologies = eval(arguments).get("potentialPathologies")
     summary = eval(arguments).get("summary")
 
     return {
         "psichologicalState": psichologicalState,
         "mainProblem": mainProblem,
         "suggestedActions": suggestedActions,
-        "potential_pathologies": potential_pathologies,
+        "potentialPathologies": potentialPathologies,
         "summary": summary
         }

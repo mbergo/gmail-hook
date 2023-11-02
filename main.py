@@ -18,17 +18,21 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as use situation, company name/product name, problem, requisition, etc. And please reply everything in the same language of the email.",
+        "description": "categorise & extract key info from an email, such as urgency, tasks, summary, etc.",
         "parameters": {
             "type": "object",
             "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title of the meet taken from the content."
+                },
                 "participant_names": {
                     "type": "string",
                     "description": "The name of the participants of the email. Upbeat, medium or down."
                 },                                        
-                "motivation_level": {
+                "urgency": {
                     "type": "string",
-                    "description": "The motivation level of each participant. If there is more than one, please separate them with a comma."
+                    "description": "The urgency of the tasks in the email. High, Medium or Low."
                 },
                 "tasks": {
                     "type": "string",
@@ -39,7 +43,7 @@ function_descriptions = [
                     "description": "Summary of the email. Try to a small summary of the email. Basic what it is about."
                 }
             },
-            "required": ["participant_names", "motivation_level", "tasks", "summary"]
+            "required": ["title", "participant_names", "urgency", "tasks", "summary"]
         }
     }
 ]
@@ -67,16 +71,18 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
+    title = eval(arguments).get("title")
     participant_names = eval(arguments).get("participant_names")
-    motivation_level = eval(arguments).get("motivation_level")
+    urgency = eval(arguments).get("urgency")
     tasks = eval(arguments).get("tasks")
     summary = eval(arguments).get("summary")
     
 
 
     return {
+        "title": title,
         "participant_names": participant_names,
-        "motivation_level": motivation_level,
+        "urgency": urgency,
         "tasks": tasks,
         "summary": summary
         }

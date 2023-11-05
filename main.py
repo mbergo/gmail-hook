@@ -22,13 +22,13 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "psichologicalState": {
+                "emotionalState": {
                     "type": "string",
-                    "description": "The psichological state of the user. If there is more than one, please separate them with a comma."
+                    "description": "The emotional state of David. Fears, axieties, everything, comma separated."
                 },                                        
-                "mainProblem": {
+                "problems": {
                     "type": "string",
-                    "description": "The main problem that the user is facing. If there is more than one, please separate them with a comma."
+                    "description": "The main problems that David  is facing. If there is more than one, please separate them with a comma."
                 },
                 "suggestedActions": {
                     "type": "string",
@@ -38,12 +38,12 @@ function_descriptions = [
                     "type": "string",
                     "description": "The potential pathologies that the user might have. If there is more than one, please separate them with a comma."
                 },
-                "summary": {
-                    "type": "string",
-                    "description": "The summary of the email regarding as a psychological session."
+                "summary_rola": {
+                    "type": "integer",
+                    "description": "The number of time that word \"chupa\" was mentioned."
                 }
             },
-            "required": ["psichologicalState", "mainProblem", "suggestedActions", "potentialPathologies", "summary"]
+            "required": ["psichologicalState", "problems" "suggestedActions", "potentialPathologies", "summary_rola"]
         }
     }
 ]
@@ -72,15 +72,15 @@ def analyse_email(email: Email):
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
     psichologicalState = eval(arguments).get("psichologicalState")
-    mainProblem = eval(arguments).get("mainProblem")
+    problems = eval(arguments).get("problems")
     suggestedActions = eval(arguments).get("suggestedActions")
     potentialPathologies = eval(arguments).get("potentialPathologies")
-    summary = eval(arguments).get("summary")
+    summary_rola = eval(arguments).get("summary_rola")
 
     return {
         "psichologicalState": psichologicalState,
-        "mainProblem": mainProblem,
+        "problems": problems,
         "suggestedActions": suggestedActions,
         "potentialPathologies": potentialPathologies,
-        "summary": summary
+        "summary_rola": summary_rola
         }

@@ -18,38 +18,54 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as use situation, company name/product name, problem, requisition, etc. And please reply everything in the same language of the email.",
+        "description": "categorise & extract key info from an email, such as use news, new tools, etc.",
         "parameters": {
             "type": "object",
             "properties": {
-                "emotionalState": {
+                "tools": {
                     "type": "string",
-                    "description": "The emotional state of David. Fears, axieties, everything, comma separated."
+                    "description": "The name of the tools that David is using. If there is more than one, please separate them with a comma."
                 },                                        
-                "problems": {
+                "description": {
                     "type": "string",
-                    "description": "The main problems that David  is facing. If there is more than one, please separate them with a comma."
+                    "description": "The description each news on the email."
                 },
-                "suggestedActions": {
+                "category": {
                     "type": "string",
-                    "description": "The suggested actions that the user should take. If there is more than one, please separate them with a comma."
-                },
-                "potentialPathologies": {
-                    "type": "string",
-                    "description": "The potential pathologies that the user might have. If there is more than one, please separate them with a comma."
-                },
-                "summary_rola": {
-                    "type": "integer",
-                    "description": "The number of time that word \"chupa\" was mentioned."
+                    "description": "The category of the news. If there is more than one, please separate them with a comma."
                 }
             },
-            "required": ["psichologicalState", "problems" "suggestedActions", "potentialPathologies", "summary_rola"]
+            "required": ["tools", "description", "category"]  
         }
     }
 ]
 
+
 class Email(BaseModel):
-    from_email: str
+    from_email: str@retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
+
+def chat_completion_request(messages, functions=None, function_call=None, model="gpt-4-0613"):
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + openai.api_key,
+    }
+    json_data = {"model": model, "messages": messages}
+    if functions is not None:
+        json_data.update({"functions": functions})
+    if function_call is not None:
+        json_data.update({"function_call": function_call})
+    try:
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers=headers,
+            json=json_data,
+        )
+        return response
+    except Exception as e:
+        print("Unable to generate ChatCompletion response")
+        print(f"Exception: {e}")
+        return e
+
     content: str
 
 @app.get("/")
@@ -63,7 +79,7 @@ def analyse_email(email: Email):
 
     messages = [{"role": "user", "content": query}]
 
-    response = openai.ChatCompletion.create(
+    response = chat_completion_request(
         model="gpt-4-0613",
         messages=messages,
         functions = function_descriptions,
@@ -71,16 +87,13 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    psichologicalState = eval(arguments).get("psichologicalState")
-    problems = eval(arguments).get("problems")
-    suggestedActions = eval(arguments).get("suggestedActions")
-    potentialPathologies = eval(arguments).get("potentialPathologies")
-    summary_rola = eval(arguments).get("summary_rola")
+    tools = eval(arguments).get("tools")
+    description = eval(arguments).get("description")
+    category = eval(arguments).get("category")
+
 
     return {
-        "psichologicalState": psichologicalState,
-        "problems": problems,
-        "suggestedActions": suggestedActions,
-        "potentialPathologies": potentialPathologies,
-        "summary_rola": summary_rola
+        "tools": tools,
+        "description": description,
+        "category": category
         }

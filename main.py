@@ -57,12 +57,9 @@ def read_root():
 
 @app.post("/")
 def read_item(email: Email):
+    from_email = str
+    content = str
     
-    def get_emqil_content(email):
-        return email.content.json()
-
-# use gpt function call to extract info from email according to the new API ()
-
     response = openai.Completion.create(
         model="gpt-4-0613",
         prompt=email.content,
@@ -70,30 +67,10 @@ def read_item(email: Email):
         function_call="auto"
     )
     
-    extract_info_from_email = response.choices[0].text
-    summary = eval(extract_info_from_email).get("summary")
-    tasks = eval(extract_info_from_email).get("tasks")
-    conclusion = eval(extract_info_from_email).get("conclusion")
+    info = response.choices[0].text
+    summary = eval(info).get("summary")
+    tasks = eval(info).get("tasks")
+    problems = eval(info).get("problems")
+    conclusion = eval(info).get("conclusion")
     
     return {"summary": summary, "tasks": tasks, "conclusion": conclusion}
-
-
-
-    response = openai.ChatCompletion.create(
-        model="gpt-4-0613",
-        prompt=email.content,
-        functions = function_descriptions,
-        function_call="auto"
-    )
-    
-    extract_info_from_email = response.choices[0].text
-    summary = eval(extract_info_from_email).get("summary")
-    tasks = eval(extract_info_from_email).get("tasks")
-    problems = eval(extract_info_from_email).get("problems")
-    conclusion = eval(extract_info_from_email).get("conclusion")
-
-
-    return {"summary": summary, "tasks": tasks, "problems": problems, "conclusion": conclusion}
-
-response = read_item(content)
-print(response)

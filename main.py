@@ -1,5 +1,5 @@
 import fastapi
-from openai import api_key_management_v1, Model, CompletionV1
+from openai import Model, CompletionV1
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -8,6 +8,9 @@ from pydantic import BaseModel
 load_dotenv()
 
 app = FastAPI()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 
 # Example function description for OpenAI's new API structure
 function_descriptions = [
@@ -46,17 +49,32 @@ def analyse_email(email: Email):
 
     messages = [{"role": "user", "content": query}]
 
-    function_call = FunctionCall(
-        function="extract_info_from_email",
-        parameters={"email_content": content}
+    function_call = {
+        "function": "extract_info_from_email",
+        "parameters": {"email_content": content}
+    }
+
+    model = Model(id="text-davinci-002", api_key=OPENAI_API_KEY)
+
+    completion = model.complete(
+        prompt=messages,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.5,
+        function_call=function_call,
+        function_description=function_descriptions
     )
 
-    model = Model(id="text-davinci-002")
-    api_key = os.getenv("OPENAI_API_KEY")
-    api_key_manager = api_key_management_v1.Client(api_key)
-    api_key_manager.create_secret()
-    api_key_manager.create_secret_version()
-    api_key_manager.add_secret_to_model(model.id)
+    response_data = completion.choices[0].text
+    summary, tasks, problems, conclusion = eval(response_data)
+
+    return {
+        "summary": summary,
+        "tasks": tasks,
+        "problems": problems,
+        "conclusion": conclusion     
+    }
 
     completion = CompletionV1.create(
         engine=model.id,
@@ -69,7 +87,13 @@ def analyse_email(email: Email):
         function_call=function_call.dict()
     )
 
-    response_data = completion.choices[0].text
+    response_data = completion.choices[0].json()
+    summary = response_data["summary"]
+    tasks = response_data["tasks"]
+    problems = response_data["problems"]
+    conclusion = response_data["conclusion"]
+
+
     summary, tasks, problems, conclusion = eval(response_data)
 
     return {

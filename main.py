@@ -60,7 +60,7 @@ def chat_completion_request(model, messages, functions, function_call: FunctionC
         functions=functions,
         function_call=function_call.dict()  # Convert the Pydantic model to a dictionary
     )
-
+    
 @app.post("/")
 def analyse_email(email: Email):
     content = email.content

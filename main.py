@@ -4,6 +4,8 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
+from openai import api_key, Model, Completion
+import json
 
 
 load_dotenv()
@@ -44,61 +46,38 @@ function_descriptions = [
 class Email(BaseModel):
     from_email: str
     content: str
+    
+# function to exrtract info from email
+def extract_info_from_email(summary, tasks, problems, conclusion):
+    return json.dumps({"summary": summary, "tasks": tasks, "problems": problems, "conclusion": conclusion})
 
 @app.get("/")
 def read_root():
     return {"message": "Hello World"}
 
 @app.post("/")
-def analyse_email(email: Email):
-    content = email.content
-    query = f"Please extract key information from this email: {content} "
+def read_item(email: Email):
+    
+    
 
-    messages = [{"role": "user", "content": query}]
+    def get_emqil_content(email):
+        return email.content.json()
+
+# adapt for the current function_descriptions
+
 
     response = openai.ChatCompletion.create(
         model="gpt-4-0613",
-        messages=messages,
+        prompt=email.content,
         functions = function_descriptions,
         function_call="auto"
     )
-
-    arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    summary = eval(arguments).get("summary")
-    tasks = eval(arguments).get("tasks")
-    problems = eval(arguments).get("problems")
-    conclusion = eval(arguments).get("conclusion")
-
-
-    return {
-        "summary": summary,
-        "tasks": tasks,
-        "problems": problems,
-        "conclusion": conclusion
-        }
+    
+    extract_info_from_email = response.choices[0].text
+    summary = eval(extract_info_from_email).get("summary")
+    tasks = eval(extract_info_from_email).get("tasks")
+    problems = eval(extract_info_from_email).get("problems")
+    conclusion = eval(extract_info_from_email).get("conclusion")
 
 
-# email = """
-# Dear Jason 
-# I hope this message finds you well. I'm Shirley from Gucci;
-
-# I'm looking to purchase some company T-shirt for my team, we are a team of 100k people, and we want to get 2 t-shirt per personl
-
-# Please let me know the price and timeline you can work with;
-
-# Looking forward
-
-# Shirley Lou
-# """
-
-# prompt = f"Please extract key information from this email: {email} "
-# message = [{"role": "user", "content": prompt}]
-
-# response = openai.ChatCompletion.create(
-#     model="gpt-4-0613",
-#     messages=message,
-#     functions = function_descriptions,
-#     function_call="auto"
-# )
-
-# print(response)
+    return {"summary": summary, "tasks": tasks, "problems": problems, "conclusion": conclusion} 

@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-
-
 load_dotenv()
 
 app = FastAPI()
@@ -47,12 +45,16 @@ class Email(BaseModel):
     from_email: str
     content: str
 
-def chat_completion_request(model, messages, functions, function_call):
+class FunctionCall(BaseModel):
+    function: str
+    parameters: dict
+
+def chat_completion_request(model, messages, functions, function_call: FunctionCall):
     return openai.ChatCompletion.create(
         model=model,
         messages=messages,
         functions=functions,
-        function_call=function_call
+        function_call=function_call.dict()  # Convert the Pydantic model to a dictionary
     )
 
 @app.get("/")
@@ -66,11 +68,16 @@ def analyse_email(email: Email):
 
     messages = [{"role": "user", "content": query}]
 
+    function_call = FunctionCall(
+        function="extract_info_from_email",  # Use the appropriate function name
+        parameters={"email_content": content}  # Pass the email content as a parameter
+    )
+
     response = chat_completion_request(
         model="gpt-4-0613",  # Verify if this model name is current
         messages=messages,
         functions=function_descriptions,
-        function_call="auto"
+        function_call=function_call
     )
 
     response_data = response.choices[0].json

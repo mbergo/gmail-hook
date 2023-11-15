@@ -49,7 +49,7 @@ class Email(BaseModel):
     from_email: str
     content: str
 
-def chat_completion_request( model="gpt-4-1106-preview", messages, functions, function_call):
+def chat_completion_request(model, messages, functions, function_call):
     return openai.ChatCompletion.create(
         model="gpt-4-1106-preview",
         messages=messages,
@@ -75,10 +75,10 @@ def analyse_email(email: Email):
         function_call="auto"
     )
 
-    summary = eval(response.choices[0].text)["summary"]
-    tasks = eval(response.choices[0].text)["tasks"]
-    problems = eval(response.choices[0].text)["problems"]
-    conclusion = eval(response.choices[0].text)["conclusion"]
+    summary = eval(response.choices[0].json)["summary"]
+    tasks = eval(response.choices[0].).json["tasks"]
+    problems = eval(response.choices[0].json)["problems"]
+    conclusion = eval(response.choices[0].json)["conclusion"]
 
 
 
@@ -88,4 +88,5 @@ def analyse_email(email: Email):
         "summary": summary,
         "tasks": tasks,
         "problems": problems,
-        "conclusion": conclusion        }
+        "conclusion": conclusion     
+        }

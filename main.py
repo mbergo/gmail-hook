@@ -45,6 +45,9 @@ class Email(BaseModel):
     from_email: str
     content: str
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
 class FunctionCall(BaseModel):
     function: str
     parameters: dict
@@ -57,10 +60,6 @@ def chat_completion_request(model, messages, functions, function_call: FunctionC
         functions=functions,
         function_call=function_call.dict()  # Convert the Pydantic model to a dictionary
     )
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
 
 @app.post("/")
 def analyse_email(email: Email):

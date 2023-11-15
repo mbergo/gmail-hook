@@ -18,55 +18,44 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as use news, new tools, etc.",
+        "description": "Categorize and extract key information from email, such as people, tasks, problems, etc.",
         "parameters": {
             "type": "object",
             "properties": {
-                "tools": {
+                "summary": {
                     "type": "string",
-                    "description": "The name of the tools that David is using. If there is more than one, please separate them with a comma."
+                    "description": "The summary of the email writen in PT-BR."
                 },                                        
-                "description": {
+                "tasks": {
                     "type": "string",
-                    "description": "The description each news on the email."
+                    "description": "The tasks of the email writen in PT-BR. If there is more than one, please separate them with a comma."
                 },
-                "category": {
+                "problems": {
                     "type": "string",
-                    "description": "The category of the news. If there is more than one, please separate them with a comma."
+                    "description": "The problems of the email writen in PT-BR. If there is more than one, please separate them with a comma."
+                },
+                "conclusion": {
+                    "type": "string",
+                    "description": "The main idea that can be inferred from the email. Please write in PT-BR."
                 }
             },
-            "required": ["tools", "description", "category"]  
+            "required": ["summary", "tasks", "problems", "conclusion" ]
         }
     }
 ]
 
 
 class Email(BaseModel):
-    from_email: str@retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
-
-def chat_completion_request(messages, functions=None, function_call=None, model="gpt-4-0613"):
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + openai.api_key,
-    }
-    json_data = {"model": model, "messages": messages}
-    if functions is not None:
-        json_data.update({"functions": functions})
-    if function_call is not None:
-        json_data.update({"function_call": function_call})
-    try:
-        response = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers=headers,
-            json=json_data,
-        )
-        return response
-    except Exception as e:
-        print("Unable to generate ChatCompletion response")
-        print(f"Exception: {e}")
-        return e
-
+    from_email: str
     content: str
+
+def chat_completion_request( model="gpt-4-1106-preview", messages, functions, function_call):
+    return openai.ChatCompletion.create(
+        model="gpt-4-1106-preview",
+        messages=messages,
+        functions=functions,
+        function_call=function_call
+    )
 
 @app.get("/")
 def read_root():
@@ -80,20 +69,23 @@ def analyse_email(email: Email):
     messages = [{"role": "user", "content": query}]
 
     response = chat_completion_request(
-        model="gpt-4-0613",
+        model="gpt-4-1106-preview",
         messages=messages,
         functions = function_descriptions,
         function_call="auto"
     )
 
-    arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    tools = eval(arguments).get("tools")
-    description = eval(arguments).get("description")
-    category = eval(arguments).get("category")
+    summary = eval(response.choices[0].text)["summary"]
+    tasks = eval(response.choices[0].text)["tasks"]
+    problems = eval(response.choices[0].text)["problems"]
+    conclusion = eval(response.choices[0].text)["conclusion"]
 
+
+
+    
 
     return {
-        "tools": tools,
-        "description": description,
-        "category": category
-        }
+        "summary": summary,
+        "tasks": tasks,
+        "problems": problems,
+        "conclusion": conclusion        }

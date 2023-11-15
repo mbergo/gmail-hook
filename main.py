@@ -1,5 +1,7 @@
 import fastapi
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -9,7 +11,7 @@ load_dotenv()
 
 app = FastAPI()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 # Example function description for OpenAI's new API structure
 function_descriptions = [
@@ -54,12 +56,10 @@ class FunctionCall(BaseModel):
 
 def chat_completion_request(model, messages, functions, function_call: FunctionCall):
     # Update according to new method signature and parameters
-    return openai.ChatCompletion.create(
-        model=model,
-        messages=messages,
-        functions=functions,
-        function_call=function_call.dict()  # Convert the Pydantic model to a dictionary
-    )
+    return client.chat.completions.create(model=model,
+    messages=messages,
+    functions=functions,
+    function_call=function_call.dict())
     
 @app.post("/")
 def analyse_email(email: Email):

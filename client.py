@@ -1,17 +1,16 @@
+
 import requests
 
-print(
-    requests.post(
-        "https://david-d21o.onrender.com/",
-        json={
-            "from_email": "marcus@bergo.one",
-            "content": """
-            Hi Marcus,
-                I am writing to you regarding the recent changes in your behaviour. I have noticed that you have been more anxious than usual. I would like to know if there is anything that I can do to help you.
-            Kind regards,
-            Marcus
+class APIClient:
+    def __init__(self, base_url):
+        self.base_url = base_url
 
-            """
-        }
-    )
-)
+    def get(self, endpoint):
+        url = self.base_url + endpoint
+        response = requests.get(url)
+        return response.json()
+
+    def post(self, endpoint, data):
+        url = self.base_url + endpoint
+        response = requests.post(url, json=data)
+        return response.json()

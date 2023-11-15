@@ -1,18 +1,19 @@
-import fastapi
-from openai import Model, CompletionV1
-import os
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
+import openai
+import os
 
-load_dotenv()
-
+# Initialize the FastAPI app
 app = FastAPI()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# Set your OpenAI API key here
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Define the request model
+class EmailContent(BaseModel):
+    content: str
 
-# Example function description for OpenAI's new API structure
+# Function descriptions
 function_descriptions = [
     {
         "name": "extract_info_from_email",
@@ -20,85 +21,63 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "email_content": {
+                "summary": {
                     "type": "string",
-                    "description": "The content of the email."
+                    "description": "The summary of the email writen in PT-BR."
+                },                                        
+                "tasks": {
+                    "type": "string",
+                    "description": "The tasks of the email writen in PT-BR. If there is more than one, please separate them with a comma."
+                },
+                "problems": {
+                    "type": "string",
+                    "description": "The problems of the email writen in PT-BR. If there is more than one, please separate them with a comma."
+                },
+                "conclusion": {
+                    "type": "string",
+                    "description": "The main idea that can be inferred from the email. Please write in PT-BR."
                 }
             },
-            "required": ["email_content"]
+            "required": ["summary", "tasks", "problems", "conclusion" ]
         }
     }
 ]
 
-class FunctionCall(BaseModel):
-    function: str
-    parameters: dict
+# Function to process email content
+def extract_info_from_email(email_content: str):
+    from_email = str(email_content).split("\n")[0]
+    content = str(email_content).split("\n")[1:]
+    try:
+        prompt = f"Email content (in Portuguese): {email_content}\n\n" \
+                 f"Summarize the email, list the tasks, identify any problems, and state the conclusion. Write in Portuguese:"
+        response = openai.Completion.create(
+            engine="davinci-002",
+            prompt=prompt,
+            max_tokens=250
+        )
+        return response.choices[0].json()
+    except Exception as e:
+        return str(e)
 
-class Email(BaseModel):
-    from_email: str
-    content: str
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
-
+# Define the POST endpoint
 @app.post("/")
-def analyse_email(email: Email):
-    content = email.content
-    query = f"Please extract key information from this email: {content}"
+def process_email(email: EmailContent):
+    from_email = str
+    content = str
+    extracted_info = extract_info_from_email(email.content)
+    summary = eval(extracted_info["text"]).json()
+    tasks = eval(extracted_info["text"]).json()
+    problems = eval(extracted_info["text"]).json()
+    conclusion = eval(extracted_info["text"]).json()
 
-    messages = [{"role": "user", "content": query}]
-
-    function_call = {
-        "function": "extract_info_from_email",
-        "parameters": {"email_content": content}
-    }
-
-    model = Model(id="text-davinci-002", api_key=OPENAI_API_KEY)
-
-    completion = model.complete(
-        prompt=messages,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.5,
-        function_call=function_call,
-        function_description=function_descriptions
-    )
-
-    response_data = completion.choices[0].text
-    summary, tasks, problems, conclusion = eval(response_data)
-
+    # Further processing of extracted_info to match the required structure is needed here
     return {
-        "summary": summary,
+        "summary": summary,  # Placeholder, replace with actual parsing logic
         "tasks": tasks,
         "problems": problems,
-        "conclusion": conclusion     
+        "conclusion": conclusion
     }
 
-    completion = CompletionV1.create(
-        engine=model.id,
-        prompt=messages,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.5,
-        function_descriptions=function_descriptions,
-        function_call=function_call.dict()
-    )
-
-    response_data = completion.choices[0].json()
-    summary = response_data["summary"]
-    tasks = response_data["tasks"]
-    problems = response_data["problems"]
-    conclusion = response_data["conclusion"]
-
-
-    summary, tasks, problems, conclusion = eval(response_data)
-
-    return {
-        "summary": summary,
-        "tasks": tasks,
-        "problems": problems,
-        "conclusion": conclusion     
-    }
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=10000)

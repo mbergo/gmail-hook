@@ -1,48 +1,46 @@
-    import fastapi
-    import openai
-    import os
-    from dotenv import load_dotenv
-    from fastapi import FastAPI
-    from pydantic import BaseModel
+import fastapi
+import openai
+import os
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 
 
+load_dotenv()
 
+app = FastAPI()
 
-    load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    app = FastAPI()
-
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-
-    function_descriptions = [
-        {
-            "name": "extract_info_from_email",
-            "description": "Categorize and extract key information from email, such as people, tasks, problems, etc.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "summary": {
-                        "type": "string",
-                        "description": "The summary of the email writen in PT-BR."
-                    },                                        
-                    "tasks": {
-                        "type": "string",
-                        "description": "The tasks of the email writen in PT-BR. If there is more than one, please separate them with a comma."
-                    },
-                    "problems": {
-                        "type": "string",
-                        "description": "The problems of the email writen in PT-BR. If there is more than one, please separate them with a comma."
-                    },
-                    "conclusion": {
-                        "type": "string",
-                        "description": "The main idea that can be inferred from the email. Please write in PT-BR."
-                    }
+function_descriptions = [
+    {
+        "name": "extract_info_from_email",
+        "description": "Categorize and extract key information from email, such as people, tasks, problems, etc.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "summary": {
+                    "type": "string",
+                    "description": "The summary of the email writen in PT-BR."
+                },                                        
+                "tasks": {
+                    "type": "string",
+                    "description": "The tasks of the email writen in PT-BR. If there is more than one, please separate them with a comma."
                 },
-                "required": ["summary", "tasks", "problems", "conclusion" ]
-            }
+                "problems": {
+                    "type": "string",
+                    "description": "The problems of the email writen in PT-BR. If there is more than one, please separate them with a comma."
+                },
+                "conclusion": {
+                    "type": "string",
+                    "description": "The main idea that can be inferred from the email. Please write in PT-BR."
+                }
+            },
+            "required": ["summary", "tasks", "problems", "conclusion" ]
         }
-    ]
+    }
+]
 
 
 class Email(BaseModel):

@@ -15,36 +15,28 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 function_descriptions = [
     {
         "name": "extract_info_from_email",
-        "description": "categorise & extract key info from an email, such as use case, company name, contact details, etc.",
+        "description": "Categorize and extract key information from email, such as people, tasks, problems, etc.",
         "parameters": {
             "type": "object",
             "properties": {
-                "companyName": {
+                "summary": {
                     "type": "string",
-                    "description": "the name of the company that sent the email"
+                    "description": "The summary of the email writen in PT-BR."
                 },                                        
-                "purpose": {
+                "tasks": {
                     "type": "string",
-                    "description": "Try to identify what is the purpose of the email, such as 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
+                    "description": "The tasks of the email writen in PT-BR. If there is more than one, please separate them with a comma."
                 },
-                "relevance":{
+                "problems": {
                     "type": "string",
-                    "description": "Try to identify the relevance of the emai. If it is a campaign email, it is not relevant; if it is a reply to a reply, it is relevant; if it customer sales, it is not relevant; etc. Categorise as low, medium, high as you see fit by if the email was sent to many people, the lower the relevance."
+                    "description": "The problems of the email writen in PT-BR. If there is more than one, please separate them with a comma."
                 },
-                "category": {
+                "conclusion": {
                     "type": "string",
-                    "description": "Try to categorise this email into categories like those: 1. Sales 2. customer support; 3. consulting; 4. partnership; etc."
-                },
-                "reply": {
-                    "type": "string",
-                    "description": "Try to identify if this email is a reply to a previous email or not. If it is a reply, it is a reply; if it is a new email, it is not a reply."
-                },
-                "suggested_reply": {
-                    "type": "string",
-                    "description": "Suggest a reply to this email based I am devops open to new opportunities and not too formal."
+                    "description": "The main idea that can be inferred from the email. Please write in PT-BR."
                 }
             },
-            "required": ["companyName", "purpose", "relevance", "category", "reply", "suggested_reply"]
+            "required": ["summary", "tasks", "problems", "conclusion" ]
         }
     }
 ]
@@ -72,21 +64,17 @@ def analyse_email(email: Email):
     )
 
     arguments = response.choices[0]["message"]["function_call"]["arguments"]
-    companyName = eval(arguments).get("companyName")
-    relevance = eval(arguments).get("relevance")
-    purpose = eval(arguments).get("purpose")
-    category = eval(arguments).get("category")
-    reply = eval(arguments).get("reply")
-    suggested_reply = eval(arguments).get("suggested_reply")
+    summary = eval(arguments).get("summary")
+    tasks = eval(arguments).get("tasks")
+    problems = eval(arguments).get("problems")
+    conclusion = eval(arguments).get("conclusion")
 
 
     return {
-        "companyName": companyName,
-        "relevance": relevance,
-        "purpose": purpose,
-        "category": category,
-        "reply": reply,
-        "suggested_reply": suggested_reply
+        "summary": summary,
+        "tasks": tasks,
+        "problems": problems,
+        "conclusion": conclusion
         }
 
 

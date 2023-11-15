@@ -67,7 +67,7 @@ def analyse_email(email: Email):
     messages = [{"role": "user", "content": query}]
 
     response = chat_completion_request(
-        model="gpt-4-1106-preview",  # Verify if this model name is current
+        model="gpt-4-0613",  # Verify if this model name is current
         messages=messages,
         functions=function_descriptions,
         function_call="auto"

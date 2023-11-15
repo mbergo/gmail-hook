@@ -1,7 +1,6 @@
 import fastapi
-from openai import OpenAI
+from openai import api_key_management_v1, Model, CompletionV1
 import os
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -9,8 +8,6 @@ from pydantic import BaseModel
 load_dotenv()
 
 app = FastAPI()
-
-
 
 # Example function description for OpenAI's new API structure
 function_descriptions = [
@@ -20,39 +17,20 @@ function_descriptions = [
         "parameters": {
             "type": "object",
             "properties": {
-                "summary": {
+                "email_content": {
                     "type": "string",
-                    "description": "The summary of the email writen in PT-BR."
-                },                                        
-                "tasks": {
-                    "type": "string",
-                    "description": "The tasks of the email writen in PT-BR. If there is more than one, please separate them with a comma."
-                },
-                "problems": {
-                    "type": "string",
-                    "description": "The problems of the email writen in PT-BR. If there is more than one, please separate them with a comma."
-                },
-                "conclusion": {
-                    "type": "string",
-                    "description": "The main idea that can be inferred from the email. Please write in PT-BR."
+                    "description": "The content of the email."
                 }
             },
-            "required": ["summary", "tasks", "problems", "conclusion" ]
+            "required": ["email_content"]
         }
     }
 ]
-
 
 class FunctionCall(BaseModel):
     function: str
     parameters: dict
 
-def chat_completion_request(model, messages, functions, function_call: FunctionCall):
-    # Update according to new method signature and parameters
-    return client.chat.completions.create(model=model,
-    messages=messages,
-    functions=functions,
-    function_call=function_call.dict())
 class Email(BaseModel):
     from_email: str
     content: str
@@ -60,7 +38,7 @@ class Email(BaseModel):
 @app.get("/")
 def read_root():
     return {"message": "Hello World"}
-    
+
 @app.post("/")
 def analyse_email(email: Email):
     content = email.content
@@ -69,23 +47,30 @@ def analyse_email(email: Email):
     messages = [{"role": "user", "content": query}]
 
     function_call = FunctionCall(
-        function="extract_info_from_email",  # Adjust according to new API
-        parameters={"email_content": content}  # Update parameters as needed
+        function="extract_info_from_email",
+        parameters={"email_content": content}
     )
 
-    response = chat_completion_request(
-        model="gpt-4-0613",  # Update model name if changed
-        messages=messages,
-        functions=function_descriptions,
-        function_call=function_call
+    model = Model(id="text-davinci-002")
+    api_key = os.getenv("OPENAI_API_KEY")
+    api_key_manager = api_key_management_v1.Client(api_key)
+    api_key_manager.create_secret()
+    api_key_manager.create_secret_version()
+    api_key_manager.add_secret_to_model(model.id)
+
+    completion = CompletionV1.create(
+        engine=model.id,
+        prompt=messages,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.5,
+        function_descriptions=function_descriptions,
+        function_call=function_call.dict()
     )
 
-    # Update response handling as per new API version
-    response_data = response.choices[0].json
-    summary = eval(response_data["summary"])
-    tasks = eval(response_data["tasks"])
-    problems = eval(response_data["problems"])
-    conclusion = eval(response_data["conclusion"])
+    response_data = completion.choices[0].text
+    summary, tasks, problems, conclusion = eval(response_data)
 
     return {
         "summary": summary,

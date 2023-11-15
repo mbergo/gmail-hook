@@ -11,6 +11,7 @@ app = FastAPI()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Example function description for OpenAI's new API structure
 function_descriptions = [
     {
         "name": "extract_info_from_email",
@@ -40,7 +41,6 @@ function_descriptions = [
     }
 ]
 
-
 class Email(BaseModel):
     from_email: str
     content: str
@@ -50,6 +50,7 @@ class FunctionCall(BaseModel):
     parameters: dict
 
 def chat_completion_request(model, messages, functions, function_call: FunctionCall):
+    # Update according to new method signature and parameters
     return openai.ChatCompletion.create(
         model=model,
         messages=messages,
@@ -69,17 +70,18 @@ def analyse_email(email: Email):
     messages = [{"role": "user", "content": query}]
 
     function_call = FunctionCall(
-        function="extract_info_from_email",  # Use the appropriate function name
-        parameters={"email_content": content}  # Pass the email content as a parameter
+        function="extract_info_from_email",  # Adjust according to new API
+        parameters={"email_content": content}  # Update parameters as needed
     )
 
     response = chat_completion_request(
-        model="gpt-4-0613",  # Verify if this model name is current
+        model="gpt-4-0613",  # Update model name if changed
         messages=messages,
         functions=function_descriptions,
         function_call=function_call
     )
 
+    # Update response handling as per new API version
     response_data = response.choices[0].json
     summary = eval(response_data["summary"])
     tasks = eval(response_data["tasks"])

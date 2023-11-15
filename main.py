@@ -74,10 +74,10 @@ def analyse_email(email: Email):
     )
 
     response_data = response.choices[0].json
-    summary = response_data["summary"]
-    tasks = response_data["tasks"]
-    problems = response_data["problems"]
-    conclusion = response_data["conclusion"]
+    summary = eval(response_data["summary"])
+    tasks = eval(response_data["tasks"])
+    problems = eval(response_data["problems"])
+    conclusion = eval(response_data["conclusion"])
 
     return {
         "summary": summary,

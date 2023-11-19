@@ -5,8 +5,6 @@ from pydantic import BaseModel
 import openai
 import json
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 # Load environment variables
 load_dotenv()
 
@@ -14,7 +12,7 @@ load_dotenv()
 app = FastAPI()
 
 # Set OpenAI API key
-
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Function specifications
 function_descriptions = [
@@ -48,83 +46,56 @@ function_descriptions = [
         }
     }
 ]
-
 # Email data model
 class Email(BaseModel):
-	from_email: str
-	content: str
-	
-	
+    from_email: str
+    content: str
+    
 @app.get("/")
-def root():
+def read_root():
 	return {"message": "Hello World"}
-	
+
 @app.post("/")
 def analyse_email(email: Email):
-	messages = [{"role": "user", "content": f"Please extract key information from this email: {email.content}"}]
+    messages = [{"role": "user", "content": f"Please extract key information from this email: {email.content}"}]
 
-	# First API call
-	response = openai.ChatCompletion.create(
-		model="gpt-4-0613",
-		messages=messages,
-		tools=function_descriptions,
-		tool_choice="auto"
-	)
+    # First API call
+    response = openai.ChatCompletion.create(
+        model="gpt-4-0613",
+        messages=messages,
+        tools=function_descriptions,
+        tool_choice="auto"
+    )
 
-	tool_calls = response.choices[0]["message"].get("tool_calls")
+    tool_calls = response.choices[0]["message"].get("tool_calls")
 
-	if tool_calls:
-		for tool_call in tool_calls:
-			if tool_call["function"]["name"] == "extract_info_from_email":
-				tool_call_id = tool_call['id']
-				arguments = json.loads(tool_call["function"]["arguments"])
+    if tool_calls:
+        for tool_call in tool_calls:
+            if tool_call["function"]["name"] == "extract_info_from_email":
+                tool_call_id = tool_call['id']
+                arguments = json.loads(tool_call["function"]["arguments"])
+                
+                # Prepare the response based on processed data
+                processed_response = {
+                    "issue": arguments.get("issue"),
+                    "explanation": arguments.get("explanation"),
+                    "category": arguments.get("category"),
+                    "fix": arguments.get("fix")
+                }
 
-				# Extract and process each field separately
-				issue = arguments.get("issue")
-				explanation = arguments.get("explanation")
-				category = arguments.get("category")
-				fix = arguments.get("fix")
+                # Append the response with the tool_call_id
+                messages.append({
+                    "role": "tool", 
+                    "content": json.dumps(processed_response),
+                    "tool_call_id": tool_call_id
+                })
 
-				# Prepare the response based on processed data
-				processed_response = {
-					"issue": issue,
-					"explanation": explanation,
-					"category": category,
-					"fix": fix
-				}
+        # Second API call
+        second_response = openai.ChatCompletion.create(
+            model="gpt-4-0613",
+            messages=messages
+        )
 
-				# Append the response with the tool_call_id
-				messages.append({
-					"role": "tool", 
-					"content": json.dumps(processed_response),
-					"tool_call_id": tool_call_id
-				})
-
-				# Extracting each field separately
-				issue = arguments.get("issue")
-				explanation = arguments.get("explanation")
-				category = arguments.get("category")
-				fix = arguments.get("fix")
-
-				# Include the processed responses in the conversation
-				messages.append({
-					"role": "tool", 
-					"content": json.dumps({
-						"issue": issue,
-						"explanation": explanation,
-						"category": category,
-						"fix": fix
-					}),
-					"tool_call_id": tool_call_id
-				})
-
-		# Second API call
-		second_response = openai.ChatCompletion.create(
-			model="gpt-4-0613",
-			messages=messages
-		)
-
-		return second_response.choices[0]["message"]
-	else:
-		return {"message": "No function call made or different function called"}
-                             
+        return second_response.choices[0]["message"]
+    else:
+        return {"message": "No function call made or different function called"}

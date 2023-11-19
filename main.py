@@ -86,19 +86,19 @@ def analyse_email(email: Email):
 				fix = arguments.get("fix")
 
             # Prepare the response based on processed data
-            processed_response = {
-                "issue": issue,
-                "explanation": explanation,
-                "category": category,
-                "fix": fix
-            }
+				processed_response = {
+					"issue": issue,
+					"explanation": explanation,
+					"category": category,
+					"fix": fix
+				}
 
-            # Append the response with the tool_call_id
-            messages.append({
-                "role": "tool", 
-                "content": json.dumps(processed_response),
-                "tool_call_id": tool_call_id
-            })
+				# Append the response with the tool_call_id
+				messages.append({
+					"role": "tool", 
+					"content": json.dumps(processed_response),
+					"tool_call_id": tool_call_id
+				})
 
 
 

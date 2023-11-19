@@ -110,6 +110,6 @@ def analyse_email(email: Email):
 #     messages=messages
 # )
 # return second_response.choices[0]["message"]
-else:
-	return {"message": "No function call made or different function called"}
+	else:
+		return {"message": "No function call made or different function called"}
 

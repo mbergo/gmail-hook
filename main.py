@@ -95,7 +95,18 @@ def analyse_email(email: Email):
 					"content": "Tool calls processed successfully"
 				})
 
-	return response.choices[0]["message"]
+	data = response.choices[0]["message"]
+	issue = data.get("issue")
+	explanation = data.get("explanation")
+	category = data.get("category")
+	fix = data.get("fix")
+ 
+	return {
+		"issue": issue,
+		"explanation": explanation,
+		"category": category,
+		"fix": fix
+	}
 
 # Second API call
 # second_response = openai.ChatCompletion.create(

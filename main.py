@@ -85,7 +85,7 @@ def analyse_email(email: Email):
 				category = arguments.get("category")
 				fix = arguments.get("fix")
 
-            # Prepare the response based on processed data
+				# Prepare the response based on processed data
 				processed_response = {
 					"issue": issue,
 					"explanation": explanation,
@@ -100,9 +100,6 @@ def analyse_email(email: Email):
 					"tool_call_id": tool_call_id
 				})
 
-
-
-				
 				# Extracting each field separately
 				issue = arguments.get("issue")
 				explanation = arguments.get("explanation")

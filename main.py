@@ -51,11 +51,7 @@ class Email(BaseModel):
     from_email: str
     content: str
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
-
-@app.post("/analyse_email")
+@app.post("/")
 def analyse_email(email: Email):
     response = openai.ChatCompletion.create(
         model="gpt-4-0613",
@@ -64,21 +60,18 @@ def analyse_email(email: Email):
         tool_choice="auto"
     )
 
-    function_call_data = response.choices[0]["message"].get("function_call")
+    if 'function_call' in response.choices[0]["message"]:
+        arguments = eval(response.choices[0]["message"]["function_call"]["arguments"])
 
-    if function_call_data and function_call_data.get("name") == "extract_info_from_email":
-        arguments = function_call_data.get("arguments", {})
-        # Extract each field safely
-        issue = arguments.get("issue")
-        explanation = arguments.get("explanation")
-        category = arguments.get("category")
-        fix = arguments.get("fix")
-
-        return {
-            "issue": issue,
-            "explanation": explanation,
-            "category": category,
-            "fix": fix
-        }
-    else:
-        return {"message": "No relevant function call made or different function called"}
+            issue = eval(arguments.get("issue"))
+            explanation = eval(arguments.get("explanation"))
+            category = eval(arguments.get("category"))
+            fix = eval(arguments.get("fix"))
+            
+            return {
+                "issue": issue,
+                "explanation": explanation,
+                "category": category,
+                "fix": fix
+            }
+                             

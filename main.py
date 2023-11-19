@@ -51,7 +51,7 @@ class Email(BaseModel):
     from_email: str
     content: str
 
-@app.post("/")
+@app.post("/analyse_email")
 def analyse_email(email: Email):
     response = openai.ChatCompletion.create(
         model="gpt-4-0613",
@@ -61,17 +61,15 @@ def analyse_email(email: Email):
     )
 
     if 'function_call' in response.choices[0]["message"]:
+        # Using eval to evaluate the string representation of the arguments dictionary
         arguments = eval(response.choices[0]["message"]["function_call"]["arguments"])
+        return {
+            "issue": arguments.get("issue"),
+            "explanation": arguments.get("explanation"),
+            "category": arguments.get("category"),
+            "fix": arguments.get("fix")
+        }
+    else:
+        return {"message": "No function call made or different function called"}
 
-            issue = eval(arguments.get("issue"))
-            explanation = eval(arguments.get("explanation"))
-            category = eval(arguments.get("category"))
-            fix = eval(arguments.get("fix"))
-            
-            return {
-                "issue": issue,
-                "explanation": explanation,
-                "category": category,
-                "fix": fix
-            }
                              

@@ -53,6 +53,11 @@ class Email(BaseModel):
     from_email: str
     content: str
     
+    
+@app.get("/")
+def root():
+    return {"message": "Hello World"}
+    
 @app.post("/")
 def analyse_email(email: Email):
     messages = [{"role": "user", "content": f"Please extract key information from this email: {email.content}"}]

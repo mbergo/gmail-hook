@@ -24,24 +24,20 @@ function_descriptions = [
 			"parameters": {
 				"type": "object",
 				"properties": {
-					"issue": {
+					"is_issue": {
 						"type": "string",
-						"description": "The issue that the email is about, such as a bug, feature request, etc."
+						"description": "Is this email about an issue or common task? Reply yes or no."
 					},
-					"explanation": {
+					"subject": {
 						"type": "string",
-						"description": "A brief explanation of the issue."
+						"description": "In the subject of the email take only the number sequence."
 					},
-					"category": {
+					"content": {
 						"type": "string",
-						"description": "Categorize this email in importance and urgency, such as low, medium, high."
-					},
-					"fix": {
-						"type": "string",
-						"description": "Identify if this email is about a fix and provide the fix how to, step-by-step."
+						"description": "The content of the email."
 					}
-				},
-				"required": ["issue", "explanation", "category", "fix"]
+				"required": ["is_issue", "content", "subject"]
+				}
 			}
 		}
 	}
@@ -76,10 +72,9 @@ def analyse_email(email: Email):
 
 				# Prepare the response based on processed data
 				processed_response = {
-					"issue": arguments.get("issue"),
-					"explanation": arguments.get("explanation"),
-					"category": arguments.get("category"),
-					"fix": arguments.get("fix")
+					"is_issue": arguments.get("is_issue"),
+					"content": arguments.get("content"), 
+					"subject": arguments.get("subject")
 				}
 
 				# Append the response with the tool_call_id
@@ -96,17 +91,24 @@ def analyse_email(email: Email):
 				})
 
 	data = response.choices[0]["message"]
-	issue = data.get("issue")
-	explanation = data.get("explanation")
-	category = data.get("category")
-	fix = data.get("fix")
+	is_issue = data.get("is_issue")
+	content = data.get("content")
+	subject = data.get("subject")
  
-	return {
-		"issue": issue,
-		"explanation": explanation,
-		"category": category,
-		"fix": fix
-	}
+	if is_issue == "yes":
+		issue = content
+		id_obj = subject
+
+ 
+		return {
+			"message": "Issue detected",
+			"issue": issue,
+			"id": id_obj
+		}
+	else:
+		return {
+			"message": "No issue detected"
+		}
 
 # Second API call
 # second_response = openai.ChatCompletion.create(

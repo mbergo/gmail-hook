@@ -36,16 +36,18 @@ function_descriptions = [
 						"type": "string",
 						"description": "The content of the email."
 					}
+				},
 				"required": ["is_issue", "content", "subject"]
-				}
 			}
 		}
 	}
 ]
+
 # Email data model
 class Email(BaseModel):
 	from_email: str
 	content: str
+
 
 @app.get("/")
 def read_root():

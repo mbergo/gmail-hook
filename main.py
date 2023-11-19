@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import openai
+import json
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 

@@ -96,7 +96,7 @@ def analyse_email(email: Email):
 					"content": "Tool calls processed successfully"
 				})
 
-		return response.choices[0]["message"]
+	return response.choices[0]["message"]
 	
 
 	# # Second API call
@@ -114,7 +114,6 @@ def analyse_email(email: Email):
     #         model="gpt-4-0613",
     #         messages=messages
     #     )
-
     #    return second_response.choices[0]["message"]
     else:
         return {"message": "No function call made or different function called"}

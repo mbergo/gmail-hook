@@ -107,7 +107,7 @@ def analyse_email(email: Email):
 	# 	tool_choice="auto"
 	# )
 
-	
+	#
 
     #     # Second API call
     #     second_response = openai.ChatCompletion.create(

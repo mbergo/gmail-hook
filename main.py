@@ -2,7 +2,9 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Load environment variables
 load_dotenv()
@@ -11,7 +13,7 @@ load_dotenv()
 app = FastAPI()
 
 # Set OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 # Function specifications
 function_descriptions = [
@@ -57,12 +59,10 @@ def read_root():
 
 @app.post("/")
 def analyse_email(email: Email):
-    response = openai.ChatCompletion.create(
-        model="gpt-4-0613",
-        messages=[{"role": "user", "content": f"Please extract key information from this email: {email.content}"}],
-        tools=function_descriptions,
-        tool_choice="auto"
-    )
+    response = client.chat.completions.create(model="gpt-4-0613",
+    messages=[{"role": "user", "content": f"Please extract key information from this email: {email.content}"}],
+    tools=function_descriptions,
+    tool_choice="auto")
 
     if 'function_call' in response.choices[0]["message"]:
         # Using eval to evaluate the string representation of the arguments dictionary

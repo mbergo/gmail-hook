@@ -24,20 +24,20 @@ function_descriptions = [
 			"parameters": {
 				"type": "object",
 				"properties": {
-					"is_issue": {
+					"severity": {
 						"type": "string",
-						"description": "Is this email about an issue or common task? Reply yes or no."
+						"description": "The severity of the issue. It can be: low, medium, high. If are not able to detect it, please set it to low."
 					},
 					"subject": {
 						"type": "string",
-						"description": "In the subject of the email take only the number sequence."
+						"description": "In the subject of the email take only the EID and the subsequent number."
 					},
 					"content": {
 						"type": "string",
 						"description": "The content of the email."
 					}
 				},
-				"required": ["is_issue", "content", "subject"]
+				"required": ["severity", "subject", "content"]
 			}
 		}
 	}
@@ -74,9 +74,9 @@ def analyse_email(email: Email):
 
 				# Prepare the response based on processed data
 				processed_response = {
-					"is_issue": arguments.get("is_issue"),
-					"content": arguments.get("content"), 
-					"subject": arguments.get("subject")
+					"severity": arguments.get("severity"),
+					"subject": arguments.get("subject"),
+					"content": arguments.get("content")
 				}
 
 				# Append the response with the tool_call_id
@@ -93,24 +93,16 @@ def analyse_email(email: Email):
 				})
 
 	data = response.choices[0]["message"]
-	is_issue = data.get("is_issue")
-	content = data.get("content")
+	severity = data.get("severity")
 	subject = data.get("subject")
+	content = data.get("content")
  
-	if is_issue == "yes":
-		issue = content
-		id_obj = subject
+	return {
+		"severity": severity,
+		"subject": subject,
+		"content": content
+	}
 
- 
-		return {
-			"message": "Issue detected",
-			"issue": issue,
-			"id": id_obj
-		}
-	else:
-		return {
-			"message": "No issue detected"
-		}
 
 # Second API call
 # second_response = openai.ChatCompletion.create(

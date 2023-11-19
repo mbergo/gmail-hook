@@ -51,55 +51,55 @@ function_descriptions = [
 
 # Email data model
 class Email(BaseModel):
-    from_email: str
-    content: str
-    
-    
+	from_email: str
+	content: str
+	
+	
 @app.get("/")
 def root():
-    return {"message": "Hello World"}
-    
+	return {"message": "Hello World"}
+	
 @app.post("/")
 def analyse_email(email: Email):
-    messages = [{"role": "user", "content": f"Please extract key information from this email: {email.content}"}]
+	messages = [{"role": "user", "content": f"Please extract key information from this email: {email.content}"}]
 
-    # First API call
-    response = openai.ChatCompletion.create(
-        model="gpt-4-0613",
-        messages=messages,
-        tools=function_descriptions,
-        tool_choice="auto"
-    )
+	# First API call
+	response = openai.ChatCompletion.create(
+		model="gpt-4-0613",
+		messages=messages,
+		tools=function_descriptions,
+		tool_choice="auto"
+	)
 
-    tool_calls = response.choices[0]["message"].get("tool_calls")
+	tool_calls = response.choices[0]["message"].get("tool_calls")
 
-if tool_calls:
-	for tool_call in tool_calls:
-		# Extract tool_call_id
-		tool_call_id = tool_call['id']
+	if tool_calls:
+		for tool_call in tool_calls:
+			# Extract tool_call_id
+			tool_call_id = tool_call['id']
 			if tool_call["function"]["name"] == "extract_info_from_email":
 				arguments = json.loads(tool_call["function"]["arguments"])
 				
 				# Extracting each field separately
-		issue = arguments.get("issue")
-		explanation = arguments.get("explanation")
-		category = arguments.get("category")
-		fix = arguments.get("fix")
+				issue = arguments.get("issue")
+				explanation = arguments.get("explanation")
+				category = arguments.get("category")
+				fix = arguments.get("fix")
 
-			# Include the processed responses in the conversation
-			messages.append({
-	"role": "tool", 
-	"content": json.dumps(your_processed_response),
-	"tool_call_id": tool_call_id  # Reference the specific tool call
-})})
+				# Include the processed responses in the conversation
+				messages.append({
+					"role": "tool", 
+					"content": json.dumps(your_processed_response),
+					"tool_call_id": tool_call_id  # Reference the specific tool call
+				})
 
-            # Second API call
-            second_response = openai.ChatCompletion.create(
-                model="gpt-4-0613",
-                messages=messages
-            )
+		# Second API call
+		second_response = openai.ChatCompletion.create(
+			model="gpt-4-0613",
+			messages=messages
+		)
 
-        return second_response.choices[0]["message"]
-    else:
-        return {"message": "No function call made or different function called"}
+		return second_response.choices[0]["message"]
+	else:
+		return {"message": "No function call made or different function called"}
                              

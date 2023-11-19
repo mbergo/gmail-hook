@@ -75,10 +75,33 @@ def analyse_email(email: Email):
 
 	if tool_calls:
 		for tool_call in tool_calls:
-			# Extract tool_call_id
-			tool_call_id = tool_call['id']
 			if tool_call["function"]["name"] == "extract_info_from_email":
+				tool_call_id = tool_call['id']
 				arguments = json.loads(tool_call["function"]["arguments"])
+
+				# Extract and process each field separately
+				issue = arguments.get("issue")
+				explanation = arguments.get("explanation")
+				category = arguments.get("category")
+				fix = arguments.get("fix")
+
+            # Prepare the response based on processed data
+            processed_response = {
+                "issue": issue,
+                "explanation": explanation,
+                "category": category,
+                "fix": fix
+            }
+
+            # Append the response with the tool_call_id
+            messages.append({
+                "role": "tool", 
+                "content": json.dumps(processed_response),
+                "tool_call_id": tool_call_id
+            })
+
+
+
 				
 				# Extracting each field separately
 				issue = arguments.get("issue")
@@ -89,8 +112,13 @@ def analyse_email(email: Email):
 				# Include the processed responses in the conversation
 				messages.append({
 					"role": "tool", 
-					"content": json.dumps(your_processed_response),
-					"tool_call_id": tool_call_id  # Reference the specific tool call
+					"content": json.dumps({
+						"issue": issue,
+						"explanation": explanation,
+						"category": category,
+						"fix": fix
+					}),
+					"tool_call_id": tool_call_id
 				})
 
 		# Second API call

@@ -50,8 +50,12 @@ function_descriptions = [
 class Email(BaseModel):
     from_email: str
     content: str
+    
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
 
-@app.post("/analyse_email")
+@app.post("/")
 def analyse_email(email: Email):
     response = openai.ChatCompletion.create(
         model="gpt-4-0613",

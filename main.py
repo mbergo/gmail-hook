@@ -73,25 +73,25 @@ def analyse_email(email: Email):
 
     tool_calls = response.choices[0]["message"].get("tool_calls")
 
-    if tool_calls:
-        for tool_call in tool_calls:
-            # Extract tool_call_id
-            tool_call_id = tool_call['id']
-                if tool_call["function"]["name"] == "extract_info_from_email":
-                    arguments = json.loads(tool_call["function"]["arguments"])
-                    
-                    # Extracting each field separately
-                    issue = arguments.get("issue")
-                    explanation = arguments.get("explanation")
-                    category = arguments.get("category")
-                    fix = arguments.get("fix")
+if tool_calls:
+	for tool_call in tool_calls:
+		# Extract tool_call_id
+		tool_call_id = tool_call['id']
+			if tool_call["function"]["name"] == "extract_info_from_email":
+				arguments = json.loads(tool_call["function"]["arguments"])
+				
+				# Extracting each field separately
+		issue = arguments.get("issue")
+		explanation = arguments.get("explanation")
+		category = arguments.get("category")
+		fix = arguments.get("fix")
 
-                    # Include the processed responses in the conversation
-                    messages.append({
-            "role": "tool", 
-            "content": json.dumps(your_processed_response),
-            "tool_call_id": tool_call_id  # Reference the specific tool call
-        })})
+			# Include the processed responses in the conversation
+			messages.append({
+	"role": "tool", 
+	"content": json.dumps(your_processed_response),
+	"tool_call_id": tool_call_id  # Reference the specific tool call
+})})
 
             # Second API call
             second_response = openai.ChatCompletion.create(
